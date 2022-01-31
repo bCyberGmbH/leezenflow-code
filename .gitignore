@@ -1,0 +1,5 @@
+__pycache__/
+.vscode/
+config.ini
+config2.ini
+log/all.log
