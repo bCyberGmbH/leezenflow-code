@@ -32,3 +32,20 @@ Source: https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/img/adafruit-m
 - After testing the service, run: `sudo systemctl enable leezenflow.service` to enable automatic startup after a reboot
 
 **Reminder: do not forget to use the `python3 -u` flag in your service definition to prevent logging problems**
+
+## License
+
+Copyright (C) 2021-2022 bCyber GmbH
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
