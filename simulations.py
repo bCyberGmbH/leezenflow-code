@@ -36,11 +36,13 @@ class Simulation():
         for i in range(len(df)):
             time.sleep(0.1) # Test dataset has 10 updates per second -> 0.1
             row = df.iloc[i,:]
-            
+
+            current_time = time.monotonic()
             shared_data = {
                 "current_phase" : row.current_phase,
-                "remaining_time" : row.remaining_time,
-                "prediction_absolute" : row.likelyTime,
+                "current_timestamp" : current_time,
+                "change_timestamp" : current_time + int(row.remaining_time),
+                "hash" : row.current_phase + str(row.likelyTime)
             }
 
             #leezenflow_object.shared_data = shared_data

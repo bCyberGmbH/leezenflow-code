@@ -36,7 +36,7 @@ class ModifierHoerstertor():
                     return shared_data
 
                 if self.anomaly_detected:
-                    new_shared_data = {}
+                    new_shared_data = shared_data.copy()
                     new_shared_data["current_phase"] = shared_data["current_phase"]
                     linear_remaining_time = shared_data["current_timestamp"] + self.hoerster_bias - self.anomaly_time_elapsed
                     new_shared_data["change_timestamp"] = int(self.bias+linear_remaining_time) 
