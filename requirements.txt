@@ -1,5 +1,4 @@
 numpy==1.20.3
 pandas==1.2.4
 paho-mqtt==1.5.1
-rgbmatrix==0.0.1
 

@@ -3,6 +3,7 @@ import time
 
 class Simulation():    
 
+    # Tests that replays recorded phases
     def mqtt_client_simulation(leezenflow_object,_,run_event):
         import io
         with io.open('sample_messages/spat.log','r',encoding='utf8') as f:
@@ -19,6 +20,7 @@ class Simulation():
             if not run_event.is_set():
                 break    
 
+    # Tests that replays recorded phases
     def mqtt_client_simulation_dataframe(leezenflow_object,_,run_event):
         import pickle
         import pandas as pd
@@ -49,63 +51,77 @@ class Simulation():
             if not run_event.is_set():
                 break 
 
-    def phase_switch_simulation(leezenflow_object,speed,run_event):
+    # Tests a continous phase switch with fixed time
+    def phase_switch_simulation(leezenflow_object,target,run_event):
         while run_event.is_set():
-            for i in range(speed,0,-1):
+            for i in range(0,target):
                 leezenflow_object.shared_data = {
                     "current_phase" : "green",
-                    "remaining_time" : i
+                    "current_timestamp": i,
+                    "change_timestamp" : target
                     }
                 time.sleep(1)
                 print(leezenflow_object.shared_data)  
                 if not run_event.is_set():
                     break      
-            for i in range(speed,0,-1):
+            for i in range(0,target):
                 leezenflow_object.shared_data = {
                     "current_phase" : "red",
-                    "remaining_time" : i
+                    "current_timestamp": i,
+                    "change_timestamp" : target
                     }
                 time.sleep(1)
                 print(leezenflow_object.shared_data)
                 if not run_event.is_set():
                     break 
 
+    # Tests a jumping non-steady prediction; e.g. from predicted 20 seconds, to 40 seconds, back to 10.
     def phase_update_simulation(leezenflow_object,color,run_event):
-        for i in range(5,0,-1):
+        timestamp = 0
+        for i in range(0,5):
+            timestamp += 1
             leezenflow_object.shared_data = {
                 "current_phase" : color,
-                "remaining_time" : i+15
+                "current_timestamp": timestamp,
+                "change_timestamp" : 15                
                 }
             print(leezenflow_object.shared_data)
             time.sleep(1)
             if not run_event.is_set():
                 break
-        for i in range(10,0,-1):
+        for i in range(0,10):
+            timestamp += 1
             leezenflow_object.shared_data = {
                 "current_phase" : color,
-                "remaining_time" : i+30
+                "current_timestamp": timestamp,
+                "change_timestamp" : 50   
                 }
             time.sleep(1)
             print(leezenflow_object.shared_data)
             if not run_event.is_set():
                 break                       
-        for i in range(10,0,-1):
+        for i in range(0,10):
+            timestamp += 1
             leezenflow_object.shared_data = {
                 "current_phase" : color,
-                "remaining_time" : i
+                "current_timestamp": timestamp,
+                "change_timestamp" : 21  
                 }
             time.sleep(1)
             print(leezenflow_object.shared_data)
             if not run_event.is_set():
                 break
 
+    # Tests high frequency updates
     def phase_fast_simulation(leezenflow_object,color,run_event):
-        for i in range(100,0,-1):
+        frequency = 10
+        for i in range(0,200):
             leezenflow_object.shared_data = {
                 "current_phase" : color,
-                "remaining_time" : int(i/5)
+                "current_timestamp": int(i/frequency),
+                "change_timestamp" : 20                  
                 }
-            time.sleep(0.2)
+            time.sleep(1/frequency)
             print(leezenflow_object.shared_data)
             if not run_event.is_set():
                 break        
