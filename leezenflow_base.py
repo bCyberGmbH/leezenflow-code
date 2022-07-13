@@ -12,7 +12,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from message_interpreter import Interpreter
-from smoother import HoersterTorSmoother
+from message_modifier import ModifierHoerstertor
 from simulations import Simulation
 
 class LeezenflowBase(object):
@@ -51,7 +51,7 @@ class LeezenflowBase(object):
             client.subscribe(self.mqtt_topic)
 
         interpreter = Interpreter()
-        #smoother = HoersterTorSmoother()
+        smoother = ModifierHoerstertor()
 
         def on_message(client, userdata, msg):
             #print(msg.topic+" "+str(msg.payload, "utf-8"),flush=True)

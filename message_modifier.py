@@ -1,9 +1,12 @@
 import time
 
-class HoersterTorSmoother():
+class ModifierHoerstertor():
+    # Problem encounterd at location Hörstertor: 
+    # The predicted phase change time can become stale, i.e. the remaining time stays at "12 sec" for half a minute. (for example)
+    # Solution: Detect this and insert an average prediction
 
     def __init__(self):
-        self.hoerster_bias = 23 # Average number of seconds that remain after an anomaly
+        self.hoerster_bias = 23 # Average number of seconds that remain after an anomaly at location Hörstertor
         self.detected_12 = False
         self.anomaly_detected = False
         self.anomaly_start_time = None
@@ -14,7 +17,8 @@ class HoersterTorSmoother():
 
     def smooth(self,shared_data):
         try:
-            if not self.detected_12 and shared_data["remaining_time"] == 12.0:
+            remaining_time = int(shared_data["change_timestamp"] - shared_data["current_timestamp"])
+            if not self.detected_12 and remaining_time == 12:
                 self.detected_12 = True
                 self.anomaly_start_time = time.monotonic()
 
@@ -23,7 +27,7 @@ class HoersterTorSmoother():
 
                 if self.anomaly_time_elapsed >= self.anomaly_time_threshold and not self.anomaly_detected:
                     self.anomaly_detected = True
-                    print("Anomaly detected")
+                    print("Stale prediction time of 12 sec remaining detected")
                     self.anomaly_phase = shared_data["current_phase"]
 
                 if self.anomaly_detected and self.anomaly_phase != shared_data["current_phase"]: # Phase has switched, resetting
@@ -34,11 +38,11 @@ class HoersterTorSmoother():
                 if self.anomaly_detected:
                     new_shared_data = {}
                     new_shared_data["current_phase"] = shared_data["current_phase"]
-                    linear_remaining_time = self.hoerster_bias - self.anomaly_time_elapsed
-                    new_shared_data["remaining_time"] = int(self.bias+linear_remaining_time/1.1**(self.anomaly_time_elapsed - self.anomaly_time_threshold)) # Not rounding will break row update
+                    linear_remaining_time = shared_data["current_timestamp"] + self.hoerster_bias - self.anomaly_time_elapsed
+                    new_shared_data["change_timestamp"] = int(self.bias+linear_remaining_time) 
                     return new_shared_data
 
-                if shared_data["remaining_time"] != 12.0:
+                if remaining_time != 12:
                     self.detected_12 = False
                     return shared_data
 
@@ -47,5 +51,5 @@ class HoersterTorSmoother():
                 return shared_data
 
         except Exception():
-            print("Smoothing failed.",flush=True)
+            print("Smoothing failed.", flush=True)
             return shared_data

@@ -24,14 +24,14 @@ class Simulation():
     def mqtt_client_simulation_dataframe(leezenflow_object,_,run_event):
         import pickle
         import pandas as pd
-        from smoother import HoersterTorSmoother
+        from message_modifier import ModifierHoerstertor
 
         df = pickle.load( open( "sample_messages/log8.p", "rb" ) )
         df = df[df.signalGroup == "33"]
         df = df.drop_duplicates(subset='xml_file', keep='first')
         df['time'] = pd.to_datetime(df['time'])
 
-        smoother = HoersterTorSmoother()
+        smoother = ModifierHoerstertor()
 
         for i in range(len(df)):
             time.sleep(0.1) # Test dataset has 10 updates per second -> 0.1
