@@ -16,7 +16,7 @@ class AnimationOrignal(LeezenflowBase):
 
         self.update_interval = 0.01
         self.matrix_height = 96              
-        self.max_white = 255 #Maximum brightness of the white bike
+        self.max_white = 255 # Maximum brightness of the white bike
 
         self.bike_box_height = 23
         self.bike_height = 8
@@ -26,6 +26,7 @@ class AnimationOrignal(LeezenflowBase):
         self.color_red = (255,49,73)
         self.length_shade = 25
         self.bias = 3
+        self.placeholder_time_for_short_phases = 45
 
         self.last_update_current_row = None
         self.last_update_prediction_sec = None
@@ -60,17 +61,15 @@ class AnimationOrignal(LeezenflowBase):
             g1 = g/length
             b1 = b/length
 
-            #draw_rectangle(y2+length,self.matrix_height,r,g,b) # Solid pure color
-
             for row in range(0,length): # Fade of length 25 upwards starting at y2
                 for pixel in range(0,32):
                     self.matrix.SetPixel(y2+row, pixel, r1*(row+1), g1*(row+1), b1*(row+1))
 
             for row in range(y1,y2): # Plain dark green/red at the bottom
                 for pixel in range(0,32):
-                    #self.matrix.SetPixel(row, pixel, 0, 0, 0) # Black
                     self.matrix.SetPixel(row, pixel, r1/2, g1/2, b1/2) # Dark green/red
 
+        # Function to manually draw a bike. It should also be possible (regarding performance) to include a .png graphic instead.
         def draw_bike(color,y_position,axis_x_left,moving=False):
             axis_x_left = axis_x_left
             axis_y = y_position
@@ -78,45 +77,39 @@ class AnimationOrignal(LeezenflowBase):
             axis_x_right = axis_x_left + 15
             radius = 5
 
-            # wheels
+            # Wheels
             graphics.DrawCircle(canvas, axis_y, axis_x_left, radius, color)
             graphics.DrawCircle(canvas, axis_y, axis_x_right, radius, color)
 
             if moving:    
-                # speed lines
+                # Speed lines
                 graphics.DrawLine(canvas, axis_y-radius+1, axis_x_left-radius-7, axis_y-radius+1, axis_x_left-radius-1, color)
                 graphics.DrawLine(canvas, axis_y-radius+4, axis_x_left-radius-4, axis_y-radius+4, axis_x_left-radius-2, color)
                 graphics.DrawLine(canvas, axis_y-radius+8, axis_x_left-radius-6, axis_y-radius+8, axis_x_left-radius-2, color)
 
-            #Stange unten horizontal
             graphics.DrawLine(canvas, axis_y, axis_x_left, axis_y, axis_x_middle, color)
-            #Linke Stange
             graphics.DrawLine(canvas, axis_y, axis_x_left, axis_y+8, axis_x_left+4, color)
-            #Mittlere Stange
             graphics.DrawLine(canvas, axis_y, axis_x_middle, axis_y+8,  axis_x_middle+4, color)
-            #Stange oben horizontal
             graphics.DrawLine(canvas, axis_y+8, axis_x_left+4, axis_y+8,  axis_x_middle+4, color)
-            #Rechte Stange
             graphics.DrawLine(canvas, axis_y, axis_x_right, axis_y+8, axis_x_right-4, color)
-            #Lenker Stange
             graphics.DrawLine(canvas, axis_y+8,  axis_x_middle+4, axis_y+10,  axis_x_middle+5, color)
-            #Lenker
             graphics.DrawLine(canvas, axis_y+10,  axis_x_middle+5, axis_y+10,  axis_x_middle+7, color)
-            #Sattle bar
             graphics.DrawLine(canvas, axis_y+9, axis_x_left+4, axis_y+10,  axis_x_left+3, color)
-            #Sattel
             graphics.DrawLine(canvas, axis_y+11,  axis_x_left+1, axis_y+11,  axis_x_left+5, color)
           
         def update_current_row():
             if self.last_update_prediction_sec <= 0.1:
-                print("Event divide by zero / or negative prediction",flush=True)
+                print("Prediction <= 0.1", flush=True)
                 return self.matrix_height
             self.current_row = self.last_update_current_row + int(((self.matrix_height - self.last_update_current_row) / self.last_update_prediction_sec) * self.last_update_elapsed_sec)
 
         def process_prediction_update():
             self.last_update_current_row = self.current_row
             self.last_update_elapsed_sec = 0
-            self.last_update_prediction_sec = self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"]
+            if self.shared_data["current_phase"] == "yellow" or self.shared_data["current_phase"] == "red-yellow":
+                self.last_update_prediction_sec = self.placeholder_time_for_short_phases
+            else:
+                self.last_update_prediction_sec = max(0, self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"])
             self.last_update_elapsed_time_start = time.monotonic()
 
         def get_next_bike_step(time_elapsed_bike,last_bike_time):
@@ -156,7 +149,7 @@ class AnimationOrignal(LeezenflowBase):
             self.start_time_bike = time.monotonic()            
             self.time_elapsed_bike = 0
 
-            self.last_update_prediction_sec = self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"] 
+            self.last_update_prediction_sec = max(0, self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"])
             self.last_message = None
             self.current_row = self.bike_box_height
             self.last_update_current_row = self.current_row
@@ -183,13 +176,12 @@ class AnimationOrignal(LeezenflowBase):
                     draw_black_trend_rectangle(0,self.current_row,g1,g2,g3) # Black fade and resetting of bike box
                     move_bikes_green()
 
-                    if self.shared_data != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.    
-                        #print("Update",flush=True)
-                        if self.shared_data["current_phase"] != "green":
+                    if self.shared_data["hash"] != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.    
+                        if self.shared_data["current_phase"] != "green" and self.shared_data["current_phase"] != "red-yellow":
                             break
                         process_prediction_update()
                         draw_rectangle(self.bike_box_height+self.current_row,self.matrix_height,g1,g2,g3) # pure green
-                        self.last_message = self.shared_data
+                        self.last_message = self.shared_data["hash"]
 
                     time.sleep(self.update_interval)
 
@@ -215,7 +207,6 @@ class AnimationOrignal(LeezenflowBase):
 
                 # Red phase while bike moving. The bike moves beyond the green phase until it is in centered position.
                 self.last_bike_time = 0.0
-                #draw_rectangle(0,self.matrix_height,0,0,0) #Reset to  black 
                 draw_rectangle(self.bike_box_height,self.matrix_height,r1,r2,r3) # Red               
                 
                 while((self.current_row < self.matrix_height) and run_event.is_set()):
@@ -229,17 +220,17 @@ class AnimationOrignal(LeezenflowBase):
                         move_bike_red()
                     else:
                         if just_switched:
-                            draw_rectangle_shade(0,self.bike_box_height,r1,r2,r3) #Reset bottom bike box to shaded red
+                            draw_rectangle_shade(0,self.bike_box_height,r1,r2,r3) # Reset bottom bike box to shaded red
                             draw_bike(graphics.Color(self.max_white, self.max_white, self.max_white),self.bike_height,self.bike_center)
                             just_switched = False
                         draw_black_trend_rectangle(self.bike_box_height,self.current_row,r1,r2,r3) # Black fade
 
-                    if self.shared_data != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.
-                        if self.shared_data["current_phase"] != "red":
+                    if self.shared_data["hash"] != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.
+                        if self.shared_data["current_phase"] != "red" and self.shared_data["current_phase"] !="yellow":
                             break
                         process_prediction_update()
                         draw_rectangle(self.bike_box_height+self.current_row,self.matrix_height,r1,r2,r3) # pure red 
-                        self.last_message = self.shared_data 
+                        self.last_message = self.shared_data["hash"] 
 
                     time.sleep(self.update_interval)
 

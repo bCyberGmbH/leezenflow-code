@@ -11,7 +11,7 @@ import configparser
 import logging
 from logging.handlers import RotatingFileHandler
 
-from mqtt_message_interpreter import Interpreter
+from message_interpreter import Interpreter
 from smoother import HoersterTorSmoother
 from simulations import Simulation
 
@@ -41,7 +41,7 @@ class LeezenflowBase(object):
         }
 
     def mqtt_client(self,_,run_event):
-        
+
         def on_connect(client, userdata, flags, rc):
             print("mqtt topic: " + str(self.mqtt_topic))
             print("Connected with result code "+str(rc),flush=True)
@@ -81,7 +81,7 @@ class LeezenflowBase(object):
 
     def process(self):
 
-        log_name = 'log/all.log'
+        log_name = 'log/console.log'
         if self.args.logging == 1:
             logging.basicConfig(filename=log_name, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.INFO)
             print("Writing log to file...",flush=True)
@@ -119,7 +119,7 @@ class LeezenflowBase(object):
 
         self.matrix = RGBMatrix(options = options)
 
-        #Initialize threading
+        # Initialize threading
         run_event = threading.Event()
         run_event.set()
 
@@ -144,8 +144,9 @@ class LeezenflowBase(object):
         elif self.args.test == 5:
             t2 = threading.Thread(target = Simulation.phase_update_simulation, args = (self,"red",run_event))
         elif self.args.test == 6:
-            print("A")
             t2 = threading.Thread(target = Simulation.phase_fast_simulation, args = (self,"green",run_event))
+        elif self.args.test == 7:
+            t2 = threading.Thread(target = Simulation.stale_prediction, args = (self,None,run_event))
         else:
             raise Exception("Invalid test dataset argument.")
 

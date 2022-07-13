@@ -1,4 +1,4 @@
-from mqtt_message_interpreter import Interpreter
+from message_interpreter import Interpreter
 import time
 
 class Simulation():    
@@ -58,7 +58,8 @@ class Simulation():
                 leezenflow_object.shared_data = {
                     "current_phase" : "green",
                     "current_timestamp": i,
-                    "change_timestamp" : target
+                    "change_timestamp" : target,
+                    "hash" : "A"
                     }
                 time.sleep(1)
                 print(leezenflow_object.shared_data)  
@@ -68,7 +69,8 @@ class Simulation():
                 leezenflow_object.shared_data = {
                     "current_phase" : "red",
                     "current_timestamp": i,
-                    "change_timestamp" : target
+                    "change_timestamp" : target,
+                    "hash" : "B"
                     }
                 time.sleep(1)
                 print(leezenflow_object.shared_data)
@@ -83,7 +85,8 @@ class Simulation():
             leezenflow_object.shared_data = {
                 "current_phase" : color,
                 "current_timestamp": timestamp,
-                "change_timestamp" : 15                
+                "change_timestamp" : 15,
+                "hash" : "A"
                 }
             print(leezenflow_object.shared_data)
             time.sleep(1)
@@ -94,7 +97,8 @@ class Simulation():
             leezenflow_object.shared_data = {
                 "current_phase" : color,
                 "current_timestamp": timestamp,
-                "change_timestamp" : 50   
+                "change_timestamp" : 50,
+                "hash" : "B" 
                 }
             time.sleep(1)
             print(leezenflow_object.shared_data)
@@ -105,7 +109,8 @@ class Simulation():
             leezenflow_object.shared_data = {
                 "current_phase" : color,
                 "current_timestamp": timestamp,
-                "change_timestamp" : 21  
+                "change_timestamp" : 21,
+                "hash" : "C" 
                 }
             time.sleep(1)
             print(leezenflow_object.shared_data)
@@ -119,9 +124,36 @@ class Simulation():
             leezenflow_object.shared_data = {
                 "current_phase" : color,
                 "current_timestamp": int(i/frequency),
-                "change_timestamp" : 20                  
+                "change_timestamp" : 20,
+                "hash" : "A" 
                 }
             time.sleep(1/frequency)
             print(leezenflow_object.shared_data)
             if not run_event.is_set():
                 break        
+
+    # Tests stale prediction
+    def stale_prediction(leezenflow_object,_,run_event):
+        while run_event.is_set():
+            for i in range(3):
+                leezenflow_object.shared_data = {
+                    "current_phase" : "red",
+                    "current_timestamp": i,
+                    "change_timestamp" : 3,
+                    "hash" : "A" 
+                    }
+                time.sleep(1)
+                print(leezenflow_object.shared_data)  
+                if not run_event.is_set():
+                    break      
+            for i in range(20):
+                leezenflow_object.shared_data = {
+                    "current_phase" : "red",
+                    "current_timestamp": 6.0 + i,
+                    "change_timestamp" : 6.0 + i,
+                    "hash" : "A" 
+                    }
+                time.sleep(1)
+                print(leezenflow_object.shared_data)
+                if not run_event.is_set():
+                    break  

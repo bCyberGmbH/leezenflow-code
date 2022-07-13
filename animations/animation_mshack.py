@@ -28,7 +28,7 @@ class AnimationMSHACK(LeezenflowBase):
             color_map = {
                 "red": "#a52019",
                 "green": "#008754",
-                "red_yellow": "#ff0",
+                "red-yellow": "#ff0",
                 "yellow": "#ff0"
             }
             color_unknown = '#00f' # blue
@@ -52,7 +52,7 @@ class AnimationMSHACK(LeezenflowBase):
 
             overlay = Image.open("animations/mshack_overlay.png")
             overlay_draw = ImageDraw.Draw(overlay)
-            if self.shared_data["current_phase"] == "red" or self.shared_data["current_phase"] == "red_yellow":
+            if self.shared_data["current_phase"] == "red" or self.shared_data["current_phase"] == "red-yellow":
                 overlay_draw.rectangle([
                     (round(w / 2) - 2, 4),
                     (round(w / 2) + 1, 5)
@@ -61,7 +61,7 @@ class AnimationMSHACK(LeezenflowBase):
                     (round(w / 2) - 1, 3),
                     (round(w / 2) + 0, 6)
                 ], fill="red", outline=None)
-            if self.shared_data["current_phase"] == "yellow" or self.shared_data["current_phase"] == "red_yellow":
+            if self.shared_data["current_phase"] == "yellow" or self.shared_data["current_phase"] == "red-yellow":
                 overlay_draw.rectangle([
                     (round(w / 2) - 2, 9),
                     (round(w / 2) + 1, 10)
@@ -88,8 +88,8 @@ class AnimationMSHACK(LeezenflowBase):
         
 def get_next_phase(current_phase):
     if current_phase["type"] == "red":
-        return {"type": "red_yellow", "length": 2}
-    if current_phase["type"] == "red_yellow":
+        return {"type": "red-yellow", "length": 2}
+    if current_phase["type"] == "red-yellow":
         return {"type": "green", "length": 18}
     if current_phase["type"] == "green":
         return {"type": "yellow", "length": 2}

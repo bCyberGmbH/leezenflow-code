@@ -1,6 +1,6 @@
 # Leezenflow Source Code
 
-This repo contains the (python) code to run [Leezenflow](https://github.com/bCyberGmbH/leezenflow-doku). It includes a script to parse the traffic light data (mqtt_message_interpreter.py) and the animation (leezenflow.py).
+This repo contains the (python) code to run [Leezenflow](https://github.com/bCyberGmbH/leezenflow-doku). It includes a script to parse the traffic light data (message_interpreter.py) and the animation (leezenflow.py).
 
 ## Requirements
 

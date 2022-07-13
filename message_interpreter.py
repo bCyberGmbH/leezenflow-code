@@ -13,21 +13,23 @@ class Interpreter():
             time_stamp = int(root.find('spat/intersections/IntersectionState/timeStamp').text)
             moy = int(root.find('spat/intersections/IntersectionState/moy').text)
             likely_time = int(root.find('spat/intersections/IntersectionState/states/MovementState/state-time-speed/MovementEvent/timing/likelyTime').text)
-            ending_phase = root.find('spat/intersections/IntersectionState/states/MovementState/state-time-speed/MovementEvent/eventState')[0].tag
+            phase = root.find('spat/intersections/IntersectionState/states/MovementState/state-time-speed/MovementEvent/eventState')[0].tag
+
+            hash_ = hash(str(likely_time) + phase)
 
             # likely_time is the 1/10 seconds of the current or (edge case) following hour 
             # time_stamp is the seconds of the minute + "000" (e.g. 25000 = 25s)
 
-            print("Interpreter:",time_stamp,moy,likely_time,ending_phase)
+            print("Interpreter:",time_stamp,moy,likely_time,phase)
 
-            if ending_phase == "pre-Movement": # red + yellow (when a red phase ends)
-                current_phase = "red_yellow"
-            elif ending_phase == "permissive-clearance": # yellow
+            if phase == "pre-Movement": # red + yellow (when a red phase ends)
+                current_phase = "red-yellow"
+            elif phase == "permissive-clearance": # yellow
                 current_phase = "yellow"      
-            elif ending_phase == 'permissive-Movement-Allowed': # green
-                    current_phase = "green"
-            elif ending_phase == 'stop-And-Remain': # red
-                    current_phase = "red"
+            elif phase == 'permissive-Movement-Allowed': # green
+                current_phase = "green"
+            elif phase == 'stop-And-Remain': # red
+                current_phase = "red"
             else:
                 current_phase = "unknown_phase_error"
             
@@ -50,7 +52,8 @@ class Interpreter():
             return {
                 "current_phase" : current_phase,
                 "current_timestamp" : current_timestamp,
-                "change_timestamp": current_timestamp + remaining_phase_seconds
+                "change_timestamp" : current_timestamp + remaining_phase_seconds,
+                "hash" : hash_ # Can be used to check whether the prediction has changed
             }
         except Exception as e:
                 return {
