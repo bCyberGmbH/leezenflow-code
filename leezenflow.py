@@ -1,8 +1,6 @@
 import time
 import argparse
 
-from animations.animation_original import AnimationOrignal
-from animations.animation_mshack import AnimationMSHACK
 from leezenflow_base import LeezenflowBase
 from rgbmatrix import graphics
 
@@ -29,14 +27,17 @@ if __name__ == "__main__":
     parser.add_argument("--led-panel-type", action="store", help="Needed to initialize special panels. Supported: 'FM6126A'", default="", type=str)
 
     # Leezenflow arguments
-    parser.add_argument("--test", action="store", help="Use test dataset. Default: -1; no test, awaits real data.", default=-1, type=int)
+    parser.add_argument("--test", action="store", help="Use test dataset. Default: -1: no test, awaits real data.", default=-1, type=int)
     parser.add_argument("--logging", action="store", help="1=Log all messages. Default:0 ", default=0, type=int)
     parser.add_argument("--animation", action="store", help="Select animation: 0-1", default=0, type=int)
+    parser.add_argument("--modifier", action="store", help="Select a modifier to smooth inaccurate predictions.", default=0, type=int)
 
     command_line_args = parser.parse_args()
-    if command_line_args.animation == 0:
+    if command_line_args.animation == 0:    
+        from animations.animation_original import AnimationOrignal
         lf = AnimationOrignal(command_line_args)
     elif command_line_args.animation == 1: 
+        from animations.animation_mshack import AnimationMSHACK
         lf = AnimationMSHACK(command_line_args)
     else:
         print("Please select a valid animation.")

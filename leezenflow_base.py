@@ -12,7 +12,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from message_interpreter import Interpreter
-from message_modifier import ModifierHoerstertor
 from simulations import Simulation
 
 class LeezenflowBase(object):
@@ -37,7 +36,8 @@ class LeezenflowBase(object):
         self.shared_data = {
             "current_phase" : "awaiting_message",
             "current_timestamp" : 0,
-            "change_timestamp" : 15, 
+            "change_timestamp" : 15,
+            "hash" : 0 
         }
 
     def mqtt_client(self,_,run_event):
@@ -51,18 +51,23 @@ class LeezenflowBase(object):
             client.subscribe(self.mqtt_topic)
 
         interpreter = Interpreter()
-        smoother = ModifierHoerstertor()
+
+        if self.args.logging == 1:
+            from message_modifier import ModifierHoerstertor
+            modify = ModifierHoerstertor().smooth
+        else:
+            print("No modifier selected.")
+            modify = lambda x: x # Return value unchanged
 
         def on_message(client, userdata, msg):
             #print(msg.topic+" "+str(msg.payload, "utf-8"),flush=True)
             shared_data = interpreter.interpret_message(str(msg.payload, "utf-8"))
-            self.shared_data = smoother.smooth(shared_data)
+            self.shared_data = modify(shared_data)
 
             logging.info("Processed: " + str(self.shared_data))    
             logging.debug(str(msg.payload, "utf-8"))
             print("Processed:",self.shared_data,flush=True)         
             
-        
         client = mqtt.Client(client_id=self.mqtt_client_name)
 
         #client.tls_set()

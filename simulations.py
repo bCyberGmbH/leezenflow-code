@@ -31,7 +31,7 @@ class Simulation():
         df = df.drop_duplicates(subset='xml_file', keep='first')
         df['time'] = pd.to_datetime(df['time'])
 
-        smoother = ModifierHoerstertor()
+        modify = ModifierHoerstertor().smooth
 
         for i in range(len(df)):
             time.sleep(0.1) # Test dataset has 10 updates per second -> 0.1
@@ -46,7 +46,7 @@ class Simulation():
             }
 
             #leezenflow_object.shared_data = shared_data
-            leezenflow_object.shared_data = smoother.smooth(shared_data)
+            leezenflow_object.shared_data = modify(shared_data)
 
             print("Simulated: ",leezenflow_object.shared_data,flush=True)
 
