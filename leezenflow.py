@@ -29,6 +29,7 @@ if __name__ == "__main__":
     # Leezenflow arguments
     parser.add_argument("--test", action="store", help="Use test dataset. Default: -1: no test, awaits real data.", default=-1, type=int)
     parser.add_argument("--logging", action="store", help="1=Log all messages. Default:0 ", default=0, type=int)
+    parser.add_argument("--stats", action="store", help="1=Store phase changes of month to csv. Default:0 ", default=0, type=int)
     parser.add_argument("--animation", action="store", help="Select animation: 0-1", default=0, type=int)
     parser.add_argument("--modifier", action="store", help="Select a modifier to smooth inaccurate predictions.", default=0, type=int)
 

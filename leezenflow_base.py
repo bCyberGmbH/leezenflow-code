@@ -12,6 +12,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from message_interpreter import Interpreter
+from message_statistics import StatisticsTool
 from simulations import Simulation
 
 class LeezenflowBase(object):
@@ -41,7 +42,6 @@ class LeezenflowBase(object):
         }
 
     def mqtt_client(self,_,run_event):
-
         def on_connect(client, userdata, flags, rc):
             print("mqtt topic: " + str(self.mqtt_topic))
             print("Connected with result code "+str(rc),flush=True)
@@ -50,8 +50,6 @@ class LeezenflowBase(object):
             # reconnect then subscriptions will be renewed.
             client.subscribe(self.mqtt_topic)
 
-        interpreter = Interpreter()
-
         if self.args.logging == 1:
             from message_modifier import ModifierHoerstertor
             modify = ModifierHoerstertor().smooth
@@ -59,9 +57,13 @@ class LeezenflowBase(object):
             print("No modifier selected.")
             modify = lambda x: x # Return value unchanged
 
+        interpreter = Interpreter()
+        statistics = StatisticsTool()  
+
         def on_message(client, userdata, msg):
-            #print(msg.topic+" "+str(msg.payload, "utf-8"),flush=True)
             shared_data = interpreter.interpret_message(str(msg.payload, "utf-8"))
+            if self.args.stats == 1:
+                statistics.save_message(shared_data)
             self.shared_data = modify(shared_data)
 
             logging.info("Processed: " + str(self.shared_data))    
@@ -85,7 +87,6 @@ class LeezenflowBase(object):
         print("Running")
 
     def process(self):
-
         log_name = 'log/console.log'
         if self.args.logging == 1:
             logging.basicConfig(filename=log_name, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.INFO)
@@ -153,7 +154,7 @@ class LeezenflowBase(object):
         elif self.args.test == 7:
             t2 = threading.Thread(target = Simulation.stale_prediction, args = (self,None,run_event))
         else:
-            raise Exception("Invalid test dataset argument.")
+            raise Exception("Invalid test argument.")
 
         # Start threads
         print("Press CTRL-C to stop leezenflow")
