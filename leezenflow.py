@@ -40,6 +40,9 @@ if __name__ == "__main__":
     elif command_line_args.animation == 1: 
         from animations.animation_mshack import AnimationMSHACK
         lf = AnimationMSHACK(command_line_args)
+    elif command_line_args.animation == 2: 
+        from animations.animation_bar import AnimationBar
+        lf = AnimationBar(command_line_args)
     else:
         print("Please select a valid animation.")
         

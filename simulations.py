@@ -79,6 +79,55 @@ class Simulation():
                 if not run_event.is_set():
                     break 
 
+    # Tests a continous phase switch with all four phases red->red-yellow->green->yellow->...
+    def phase_switch_simulation_4_phases(leezenflow_object,target,run_event):
+        mini_phase = 1
+        while run_event.is_set():
+            for i in range(0,target):
+                leezenflow_object.shared_data = {
+                    "current_phase" : "red",
+                    "current_timestamp": i,
+                    "change_timestamp" : target,
+                    "hash" : "R"
+                    }
+                time.sleep(1)
+                print(leezenflow_object.shared_data)  
+                if not run_event.is_set():
+                    break      
+            for i in range(0,mini_phase):
+                leezenflow_object.shared_data = {
+                    "current_phase" : "red-yellow",
+                    "current_timestamp": i,
+                    "change_timestamp" : mini_phase,
+                    "hash" : "RY"
+                    }
+                time.sleep(1)
+                print(leezenflow_object.shared_data)  
+                if not run_event.is_set():
+                    break         
+            for i in range(0,target):
+                leezenflow_object.shared_data = {
+                    "current_phase" : "green",
+                    "current_timestamp": i,
+                    "change_timestamp" : target,
+                    "hash" : "G"
+                    }
+                time.sleep(1)
+                print(leezenflow_object.shared_data)
+                if not run_event.is_set():
+                    break
+            for i in range(0,mini_phase):
+                leezenflow_object.shared_data = {
+                    "current_phase" : "yellow",
+                    "current_timestamp": i,
+                    "change_timestamp" : mini_phase,
+                    "hash" : "Y"
+                    }
+                time.sleep(1)
+                print(leezenflow_object.shared_data)  
+                if not run_event.is_set():
+                    break              
+
     # Tests a jumping non-steady prediction; e.g. from predicted 20 seconds, to 40 seconds, back to 10.
     def phase_update_simulation(leezenflow_object,color,run_event):
         timestamp = 0
@@ -148,12 +197,23 @@ class Simulation():
                 print(leezenflow_object.shared_data)  
                 if not run_event.is_set():
                     break      
-            for i in range(20):
+            for i in range(10):
                 leezenflow_object.shared_data = {
                     "current_phase" : "red",
                     "current_timestamp": 6.0 + i,
                     "change_timestamp" : 6.0 + i,
                     "hash" : "A" 
+                    }
+                time.sleep(1)
+                print(leezenflow_object.shared_data)
+                if not run_event.is_set():
+                    break  
+            for i in range(10):
+                leezenflow_object.shared_data = {
+                    "current_phase" : "green",
+                    "current_timestamp": i,
+                    "change_timestamp" : 10,
+                    "hash" : "B" 
                     }
                 time.sleep(1)
                 print(leezenflow_object.shared_data)

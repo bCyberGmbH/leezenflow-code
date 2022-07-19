@@ -134,11 +134,7 @@ class LeezenflowBase(object):
         if self.args.test == -1:
             t2 = threading.Thread(target = self.mqtt_client, args = (None,run_event))
         elif self.args.test == 0:
-            self.shared_data = {
-             "current_phase" : "red",
-             "remaining_time" : 10
-            }
-            t2 = threading.Thread(target = lambda: print("No second thread."))
+            t2 = threading.Thread(target = Simulation.phase_switch_simulation_4_phases, args = (self,5,run_event))
         elif self.args.test == 1:
             t2 = threading.Thread(target = Simulation.mqtt_client_simulation, args = (self,None,run_event))
         elif self.args.test == 2:

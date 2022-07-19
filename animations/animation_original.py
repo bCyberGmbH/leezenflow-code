@@ -157,7 +157,7 @@ class AnimationOrignal(LeezenflowBase):
         ### Start the loop ###
         while(run_event.is_set()):
             ## Green phase ##
-            if self.shared_data["current_phase"] == "green":
+            if self.shared_data["current_phase"] == "green" or self.shared_data["current_phase"] == "red-yellow":
               
                 # There are two bikes such that the second bike can roll into the matrix before the other has left 
                 self.last_bike_time = 0.0                
@@ -200,7 +200,7 @@ class AnimationOrignal(LeezenflowBase):
                         break
 
             ## Red phase ##  
-            elif self.shared_data["current_phase"] == "red":
+            elif self.shared_data["current_phase"] == "red" or self.shared_data["current_phase"] == "yellow":
 
                 initialize_phase_variables()
                 just_switched = True
