@@ -48,10 +48,6 @@ class AnimationBar(LeezenflowBase):
             graphics.DrawLine(canvas, axis_y+9, axis_x_left+4, axis_y+10,  axis_x_left+3, color)
             graphics.DrawLine(canvas, axis_y+11,  axis_x_left+1, axis_y+11,  axis_x_left+5, color)
 
-        def setRow(row_nr):
-            for pixel in range(0,32):
-                self.matrix.SetPixel(row_nr, pixel, 0, 0, 0)
-
         def draw_rectangle(x0,y0,x1,y1,r,g,b):
             for row in range(y0,y1):
                 graphics.DrawLine(canvas, row, x0, row, x1, graphics.Color(r,g,b))
@@ -60,12 +56,6 @@ class AnimationBar(LeezenflowBase):
             max = self.MATRIX_HEIGHT-1
             graphics.DrawLine(canvas, 0, 0, 0, self.MATRIX_WIDTH - 1, graphics.Color(r,g,b))
             graphics.DrawLine(canvas, max, 0, max, self.MATRIX_WIDTH - 1, graphics.Color(r,g,b))
-
-        def draw_rectangle_shade(y0,y1,r,g,b):
-            shade_intensity = self.length_shade *2
-            for row in range(y0,y1):
-                for pixel in range(0,32):
-                    self.matrix.SetPixel(row, pixel, r/shade_intensity, g/shade_intensity, b/shade_intensity)
 
         # y = position where the fade starts
         def draw_bar(y,r,g,b):
