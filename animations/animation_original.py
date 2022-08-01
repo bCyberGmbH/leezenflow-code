@@ -1,6 +1,8 @@
-from leezenflow_base import LeezenflowBase
 from rgbmatrix import graphics
 import time
+
+from leezenflow_base import LeezenflowBase
+from shared_state import SharedState
 
 class AnimationOrignal(LeezenflowBase):
     def __init__(self, command_line_args):
@@ -106,10 +108,10 @@ class AnimationOrignal(LeezenflowBase):
         def process_prediction_update():
             self.last_update_current_row = self.current_row
             self.last_update_elapsed_sec = 0
-            if self.shared_data["current_phase"] == "yellow" or self.shared_data["current_phase"] == "red-yellow":
+            if SharedState.shared_data["current_phase"] == "yellow" or SharedState.shared_data["current_phase"] == "red-yellow":
                 self.last_update_prediction_sec = self.placeholder_time_for_short_phases
             else:
-                self.last_update_prediction_sec = max(0, self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"])
+                self.last_update_prediction_sec = max(0, SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"])
             self.last_update_elapsed_time_start = time.monotonic()
 
         def get_next_bike_step(time_elapsed_bike,last_bike_time):
@@ -149,7 +151,7 @@ class AnimationOrignal(LeezenflowBase):
             self.start_time_bike = time.monotonic()            
             self.time_elapsed_bike = 0
 
-            self.last_update_prediction_sec = max(0, self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"])
+            self.last_update_prediction_sec = max(0, SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"])
             self.last_message = None
             self.current_row = self.bike_box_height
             self.last_update_current_row = self.current_row
@@ -157,7 +159,7 @@ class AnimationOrignal(LeezenflowBase):
         ### Start the loop ###
         while(run_event.is_set()):
             ## Green phase ##
-            if self.shared_data["current_phase"] == "green" or self.shared_data["current_phase"] == "red-yellow":
+            if SharedState.shared_data["current_phase"] == "green" or SharedState.shared_data["current_phase"] == "red-yellow":
               
                 # There are two bikes such that the second bike can roll into the matrix before the other has left 
                 self.last_bike_time = 0.0                
@@ -176,18 +178,18 @@ class AnimationOrignal(LeezenflowBase):
                     draw_black_trend_rectangle(0,self.current_row,g1,g2,g3) # Black fade and resetting of bike box
                     move_bikes_green()
 
-                    if self.shared_data["hash"] != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.    
-                        if self.shared_data["current_phase"] != "green" and self.shared_data["current_phase"] != "red-yellow":
+                    if SharedState.shared_data["hash"] != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.    
+                        if SharedState.shared_data["current_phase"] != "green" and SharedState.shared_data["current_phase"] != "red-yellow":
                             break
                         process_prediction_update()
                         draw_rectangle(self.bike_box_height+self.current_row,self.matrix_height,g1,g2,g3) # pure green
-                        self.last_message = self.shared_data["hash"]
+                        self.last_message = SharedState.shared_data["hash"]
 
                     time.sleep(self.update_interval)
 
                 # Wait until there is a message that the phase has actually changed
                 time_wait = time.monotonic()
-                while self.shared_data["current_phase"] == "green" and run_event.is_set():
+                while SharedState.shared_data["current_phase"] == "green" and run_event.is_set():
                     # Continue to move bikes
                     draw_rectangle_shade(0,self.matrix_height,g1,g2,g3) # Just to reset each bike frame 
                     move_bikes_green()
@@ -196,11 +198,11 @@ class AnimationOrignal(LeezenflowBase):
                     time.sleep(self.update_interval)
                     if time.monotonic() >= time_wait + 60: # 60 sec w/o expected phase change
                         print("Green phase prediction time ended 60s ago, however no red phase message was received. Leaving green state...",flush=True)
-                        self.shared_data["current_phase"] = "awaiting_message"
+                        SharedState.shared_data["current_phase"] = "awaiting_message"
                         break
 
             ## Red phase ##  
-            elif self.shared_data["current_phase"] == "red" or self.shared_data["current_phase"] == "yellow":
+            elif SharedState.shared_data["current_phase"] == "red" or SharedState.shared_data["current_phase"] == "yellow":
 
                 initialize_phase_variables()
                 just_switched = True
@@ -225,30 +227,30 @@ class AnimationOrignal(LeezenflowBase):
                             just_switched = False
                         draw_black_trend_rectangle(self.bike_box_height,self.current_row,r1,r2,r3) # Black fade
 
-                    if self.shared_data["hash"] != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.
-                        if self.shared_data["current_phase"] != "red" and self.shared_data["current_phase"] !="yellow":
+                    if SharedState.shared_data["hash"] != self.last_message: # This avoids updates with every message that would break animation. Problematic with additional info in shared data.
+                        if SharedState.shared_data["current_phase"] != "red" and SharedState.shared_data["current_phase"] !="yellow":
                             break
                         process_prediction_update()
                         draw_rectangle(self.bike_box_height+self.current_row,self.matrix_height,r1,r2,r3) # pure red 
-                        self.last_message = self.shared_data["hash"] 
+                        self.last_message = SharedState.shared_data["hash"] 
 
                     time.sleep(self.update_interval)
 
                 # Wait until there is a message that the phase has actually changed
                 time_wait = time.monotonic()
-                while self.shared_data["current_phase"] == "red" and run_event.is_set():
+                while SharedState.shared_data["current_phase"] == "red" and run_event.is_set():
                     time.sleep(0.1)
                     if time.monotonic() >= time_wait + 60: # 60 sec w/o expected phase change
                         print("Red phase prediction time ended 10s ago, however no green phase message was received. Leaving red state...",flush=True)
-                        self.shared_data["current_phase"] = "awaiting_message"
+                        SharedState.shared_data["current_phase"] = "awaiting_message"
                         break
 
-            elif self.shared_data["current_phase"] == "awaiting_message":
+            elif SharedState.shared_data["current_phase"] == "awaiting_message":
                 time_wait = time.monotonic()
                 print("Awaiting message...",flush=True)
                 pulse = 255
                 down = True
-                while self.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():
+                while SharedState.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():
                     time.sleep(0.1)
                     draw_bike(graphics.Color(pulse, pulse, pulse),self.bike_height,self.bike_center)
                     if down:
@@ -264,10 +266,10 @@ class AnimationOrignal(LeezenflowBase):
                     if time.monotonic() >= time_wait + 600: # After 10 min
                         draw_rectangle(0,self.matrix_height,0,0,0)
                         self.matrix.SetPixel(1, 1, 10, 10, 10) # Debug pixel
-                        while self.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():                                                      
+                        while SharedState.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():                                                      
                             time.sleep(1)
             else:
-                print("Unknown phase / error: ",self.shared_data,flush=True)
+                print("Unknown phase / error: ",SharedState.shared_data,flush=True)
                 draw_bike(graphics.Color(255,49,73),self.bike_height,self.bike_center)
                 time.sleep(15)
                 print("Trying again...",flush=True)

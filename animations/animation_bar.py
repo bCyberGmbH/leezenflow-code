@@ -1,6 +1,8 @@
-from leezenflow_base import LeezenflowBase
 from rgbmatrix import graphics
 import time
+
+from leezenflow_base import LeezenflowBase
+from shared_state import SharedState
 
 class AnimationBar(LeezenflowBase):
     def __init__(self, command_line_args):
@@ -74,7 +76,7 @@ class AnimationBar(LeezenflowBase):
             draw_boder_top_bottom(r,g,b)
 
         def get_decrease_rate():
-            remaining_time = max(0.1, self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"]) # Avoids divide by zero 
+            remaining_time = max(0.1, SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]) # Avoids divide by zero 
             return (self.MATRIX_HEIGHT - self.current_row) / remaining_time # E.g. 3 rows per s
 
         def draw_phase(phase_primary, phase_secondary, color1, color2, color3):
@@ -84,7 +86,7 @@ class AnimationBar(LeezenflowBase):
 
             while((self.current_row < (self.MATRIX_HEIGHT)) and run_event.is_set()):
                 if timer + self.UPDATE_INTERVAL_ANIMATION <= time.monotonic():
-                    if self.shared_data["current_phase"] == phase_secondary:
+                    if SharedState.shared_data["current_phase"] == phase_secondary:
                         decrease_rate = self.STATIC_DECREASE_RATE
                     else:
                         decrease_rate = get_decrease_rate()
@@ -94,7 +96,7 @@ class AnimationBar(LeezenflowBase):
                     draw_bar(int(self.current_row),color1,color2,color3)
                     timer = time.monotonic()
 
-                if self.shared_data["current_phase"] != phase_primary and self.shared_data["current_phase"] != phase_secondary:
+                if SharedState.shared_data["current_phase"] != phase_primary and SharedState.shared_data["current_phase"] != phase_secondary:
                     break
 
                 time.sleep(self.UPDATE_INTERVAL)
@@ -103,11 +105,11 @@ class AnimationBar(LeezenflowBase):
         while(run_event.is_set()):
         
             ## Green phase ##
-            if self.shared_data["current_phase"] == "green" or self.shared_data["current_phase"] == "red-yellow":
+            if SharedState.shared_data["current_phase"] == "green" or SharedState.shared_data["current_phase"] == "red-yellow":
                 draw_phase("green","red-yellow",g1,g2,g3)
               
             ## Red phase ##
-            elif self.shared_data["current_phase"] == "red" or self.shared_data["current_phase"] == "yellow":
+            elif SharedState.shared_data["current_phase"] == "red" or SharedState.shared_data["current_phase"] == "yellow":
                 draw_phase("red","yellow",r1,r2,r3)
 
             ## Draws a pulsing bike while awaiting message  ##
@@ -116,8 +118,8 @@ class AnimationBar(LeezenflowBase):
                 print("Awaiting message...",flush=True)
                 pulse = 255
                 down = True
-                if self.shared_data["current_phase"] == "awaiting_message":
-                    while self.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():
+                if SharedState.shared_data["current_phase"] == "awaiting_message":
+                    while SharedState.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():
                         time.sleep(0.1)
                         draw_bike(graphics.Color(pulse, pulse, pulse),8,8)
                         if down:
@@ -133,10 +135,10 @@ class AnimationBar(LeezenflowBase):
                         if time.monotonic() >= time_wait + 600: # After 10 min exit pulsing bike and show a single pixel
                             canvas.Fill(color1,color2,color3)
                             canvas.SetPixel(1, 1, 20, 20, 20) # Debug indicator pixel at position (1,1)
-                            while self.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():                                                      
+                            while SharedState.shared_data["current_phase"] == "awaiting_message" and run_event.is_set():                                                      
                                 time.sleep(1)
                 else:
-                    print("Unknown phase / error: ",self.shared_data,flush=True)
+                    print("Unknown phase / error: ",SharedState.shared_data,flush=True)
                     canvas.SetPixel(1, self.MATRIX_WIDTH - 2, 255, 49, 73) # Red error indicator pixel
                     time.sleep(2)
                     print("Trying again...",flush=True)

@@ -6,6 +6,7 @@ from rgbmatrix import graphics
 from PIL import Image, ImageDraw
 
 from leezenflow_base import LeezenflowBase
+from shared_state import SharedState
 
 class AnimationMSHACK(LeezenflowBase):
     def __init__(self, command_line_args):
@@ -23,7 +24,7 @@ class AnimationMSHACK(LeezenflowBase):
 
         ### Start the loop ###
         while(run_event.is_set()):
-            remaining_time = max(0, self.shared_data["change_timestamp"] - self.shared_data["current_timestamp"])
+            remaining_time = max(0, SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"])
 
             color_map = {
                 "red": "#a52019",
@@ -43,7 +44,7 @@ class AnimationMSHACK(LeezenflowBase):
                 return position + length_in_pixel
            
             draw_position = upper_end
-            draw_phase = { "type": self.shared_data["current_phase"], "length": remaining_time }
+            draw_phase = { "type": SharedState.shared_data["current_phase"], "length": remaining_time }
             for i in range(5):
                 draw_position = draw_phase_bar(draw_phase["type"], draw_phase["length"], draw_position)
                 draw_phase = get_next_phase(draw_phase)
@@ -52,7 +53,7 @@ class AnimationMSHACK(LeezenflowBase):
 
             overlay = Image.open("animations/mshack_overlay.png")
             overlay_draw = ImageDraw.Draw(overlay)
-            if self.shared_data["current_phase"] == "red" or self.shared_data["current_phase"] == "red-yellow":
+            if SharedState.shared_data["current_phase"] == "red" or SharedState.shared_data["current_phase"] == "red-yellow":
                 overlay_draw.rectangle([
                     (round(w / 2) - 2, 4),
                     (round(w / 2) + 1, 5)
@@ -61,7 +62,7 @@ class AnimationMSHACK(LeezenflowBase):
                     (round(w / 2) - 1, 3),
                     (round(w / 2) + 0, 6)
                 ], fill="red", outline=None)
-            if self.shared_data["current_phase"] == "yellow" or self.shared_data["current_phase"] == "red-yellow":
+            if SharedState.shared_data["current_phase"] == "yellow" or SharedState.shared_data["current_phase"] == "red-yellow":
                 overlay_draw.rectangle([
                     (round(w / 2) - 2, 9),
                     (round(w / 2) + 1, 10)
@@ -70,7 +71,7 @@ class AnimationMSHACK(LeezenflowBase):
                     (round(w / 2) - 1, 8),
                     (round(w / 2) + 0, 11)
                 ], fill="yellow", outline=None)
-            if self.shared_data["current_phase"] == "green":
+            if SharedState.shared_data["current_phase"] == "green":
                 overlay_draw.rectangle([
                     (round(w / 2) - 2, 14),
                     (round(w / 2) + 1, 15)

@@ -4,7 +4,6 @@ import sys
 import os
 import threading
 
-import paho.mqtt.client as mqtt
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 import configparser
@@ -15,42 +14,14 @@ from message_interpreter import Interpreter
 from message_statistics import StatisticsTool
 from simulations import Simulation
 
+from shared_state import SharedState
+
 class LeezenflowBase(object):
     def __init__(self, command_line_args):
-        try:    
-            config = configparser.ConfigParser()
-            config.read('config.ini')
-
-            self.mqtt_server_ip = config['mqtt']['server_ip']
-            self.mqtt_server_port = int(config['mqtt']['server_port'])
-            self.mqtt_topic =  config['mqtt']['topic']
-            self.mqtt_client_name = config['mqtt']['client_name']
-            self.mqtt_use_auth = config['mqtt']['use_auth']
-            self.mqtt_client_user_name = config['mqtt']['client_user_name']
-            self.mqtt_client_pw = config['mqtt']['client_pw']
-        except KeyError:
-            print("Configuration file for MQTT missing...")
-
         self.args = command_line_args
-            
-        # Initialize status dictionary that is shared by the interpretation and animation logic
-        self.shared_data = {
-            "current_phase" : "awaiting_message",
-            "current_timestamp" : 0,
-            "change_timestamp" : 15,
-            "hash" : 0 
-        }
 
-    def mqtt_client(self,_,run_event):
-        def on_connect(client, userdata, flags, rc):
-            print("mqtt topic: " + str(self.mqtt_topic))
-            print("Connected with result code "+str(rc),flush=True)
-
-            # Subscribing in on_connect() means that if we lose the connection and
-            # reconnect then subscriptions will be renewed.
-            client.subscribe(self.mqtt_topic)
-
-        if self.args.logging == 1:
+    def receiver(self, mode, run_event):
+        if self.args.modifier == 1:
             from message_modifier import ModifierHoerstertor
             modify = ModifierHoerstertor().smooth
         else:
@@ -60,31 +31,30 @@ class LeezenflowBase(object):
         interpreter = Interpreter()
         statistics = StatisticsTool()  
 
-        def on_message(client, userdata, msg):
-            shared_data = interpreter.interpret_message(str(msg.payload, "utf-8"))
-            if self.args.stats == 1:
-                statistics.save_message(shared_data)
-            self.shared_data = modify(shared_data)
+        try:    
+            config = configparser.ConfigParser()
+            config.read('config.ini')
+        except KeyError:
+            print("Configuration file or values within missing...")
 
-            logging.info("Processed: " + str(self.shared_data))    
-            logging.debug(str(msg.payload, "utf-8"))
-            print("Processed:",self.shared_data,flush=True)         
-            
-        client = mqtt.Client(client_id=self.mqtt_client_name)
+        if mode == "mqtt":
+            from receivers.mqtt import MQTTReceiver
+            client = MQTTReceiver(config=config, interpreter=interpreter, flag_stats=self.args.logging, statistics=statistics, logging=logging, modify=modify)
+            client.start()
 
-        #client.tls_set()
-        if self.mqtt_use_auth == "yes":
-            client.username_pw_set(username=self.mqtt_client_user_name,password=self.mqtt_client_pw)
+            while run_event.is_set():
+                client.loop()
 
-        client.on_connect = on_connect
-        client.on_message = on_message
-        client.connect(self.mqtt_server_ip, self.mqtt_server_port, 86400) # Timeout 1 day, default 60s
+        elif mode == "udp":
+            from receivers.udp import UDPReceiver
+            from message_interpreter import InterpreterTest
 
-        while run_event.is_set():
-            client.loop()
+            SharedState.interpreter = InterpreterTest.interpret_message
+            client = UDPReceiver(config=config)
+            client.run()
 
-    def run(self,_,run_event):
-        print("Running")
+        else:
+            print("No messages will be received. Use tests to simulate messages.")
 
     def process(self):
         log_name = 'log/console.log'
@@ -129,39 +99,52 @@ class LeezenflowBase(object):
         run_event = threading.Event()
         run_event.set()
 
+        # Start animation
         t1 = threading.Thread(target = self.run, args = (None,run_event))
 
+        if self.args.receiver == 0:
+            pass
+        elif self.args.receiver == 1:
+            t2 = threading.Thread(target = self.receiver(mode="mqtt"), args = (None,run_event))
+        elif self.args.receiver == 2:
+            t2 = threading.Thread(target = self.receiver, args = ("udp",run_event))
+        else:
+            raise Exception("Invalid receiver argument.")
+
         if self.args.test == -1:
-            t2 = threading.Thread(target = self.mqtt_client, args = (None,run_event))
+            pass
         elif self.args.test == 0:
-            t2 = threading.Thread(target = Simulation.phase_switch_simulation_4_phases, args = (self,5,run_event))
+            t2 = threading.Thread(target = Simulation.phase_switch_simulation_4_phases, args = (5,run_event))
         elif self.args.test == 1:
-            t2 = threading.Thread(target = Simulation.mqtt_client_simulation, args = (self,None,run_event))
+            t2 = threading.Thread(target = Simulation.mqtt_client_simulation, args = (None,run_event))
         elif self.args.test == 2:
-            t2 = threading.Thread(target = Simulation.mqtt_client_simulation_dataframe, args = (self,None,run_event))
+            t2 = threading.Thread(target = Simulation.mqtt_client_simulation_dataframe, args = (None,run_event))
         elif self.args.test == 3:
-            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (self,15,run_event))
+            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (15,run_event))
         elif self.args.test == 4:
-            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (self,30,run_event))            
+            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (30,run_event))            
         elif self.args.test == 5:
-            t2 = threading.Thread(target = Simulation.phase_update_simulation, args = (self,"red",run_event))
+            t2 = threading.Thread(target = Simulation.phase_update_simulation, args = ("red",run_event))
         elif self.args.test == 6:
-            t2 = threading.Thread(target = Simulation.phase_fast_simulation, args = (self,"green",run_event))
+            t2 = threading.Thread(target = Simulation.phase_fast_simulation, args = ("green",run_event))
         elif self.args.test == 7:
-            t2 = threading.Thread(target = Simulation.stale_prediction, args = (self,None,run_event))
+            t2 = threading.Thread(target = Simulation.stale_prediction, args = (None,run_event))
         else:
             raise Exception("Invalid test argument.")
 
         # Start threads
         print("Press CTRL-C to stop leezenflow")
         t1.start()
-        t2.start()
+        try:
+            t2.start()
+        except UnboundLocalError:
+            print("Aborted. Use flag --test 0 to run with test dataset.")
 
         try:
             while True:
                 time.sleep(.1)
         except KeyboardInterrupt:
-            print ("Attempting to close threads...")
+            print("Attempting to close threads...")
             run_event.clear()
             t1.join()
             t2.join()

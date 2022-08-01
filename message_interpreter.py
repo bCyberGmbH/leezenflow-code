@@ -2,9 +2,6 @@ import time
 import xml.etree.ElementTree as ET
 
 class Interpreter():
-    def __init__(self):
-        pass
-
     def interpret_message(self,message):
         try:
             tree = ET.ElementTree(ET.fromstring(message))
@@ -62,3 +59,11 @@ class Interpreter():
                     "message": message
                 }
 
+class InterpreterTest():
+    def interpret_message(message):
+        return {
+                "current_phase" : "red",
+                "current_timestamp" : 0,
+                "change_timestamp" : 10,
+                "hash" : hash(str(message))
+            }
