@@ -1,12 +1,14 @@
-from rgbmatrix import graphics
 import time
 
+from rgbmatrix import graphics
+
 from leezenflow_base import LeezenflowBase
+import animations.draw_digits_transition as draw_digits
 from shared_state import SharedState
 
-class AnimationBar(LeezenflowBase):
+class AnimationBarCounterTransition(LeezenflowBase):
     def __init__(self, command_line_args):
-        super(AnimationBar, self).__init__(command_line_args)
+        super(self.__class__, self).__init__(command_line_args)
 
         self.COLOR_GREEN = (0,255,132)
         self.COLOR_RED = (255,49,73)
@@ -94,6 +96,9 @@ class AnimationBar(LeezenflowBase):
                     self.current_row = min(self.MATRIX_HEIGHT - 1, self.current_row + (decrease_rate * (time.monotonic() - timer)))
                     #print(decrease_rate, self.current_row)
                     draw_bar(int(self.current_row),color1,color2,color3)
+                    if not SharedState.shared_data["current_phase"] == phase_secondary:
+                        remaining_time = int(max(0, SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]))
+                        draw_digits.number(remaining_time, canvas, color1, color2, color3, self.current_row)
                     timer = time.monotonic()
 
                 if SharedState.shared_data["current_phase"] != phase_primary and SharedState.shared_data["current_phase"] != phase_secondary:
@@ -103,7 +108,7 @@ class AnimationBar(LeezenflowBase):
 
         ### Start the loop ###
         while(run_event.is_set()):
-        
+
             ## Green phase ##
             if SharedState.shared_data["current_phase"] == "green" or SharedState.shared_data["current_phase"] == "red-yellow":
                 draw_phase("green","red-yellow",g1,g2,g3)

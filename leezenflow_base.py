@@ -120,7 +120,7 @@ class LeezenflowBase(object):
         elif self.args.test == 2:
             t2 = threading.Thread(target = Simulation.mqtt_client_simulation_dataframe, args = (None,run_event))
         elif self.args.test == 3:
-            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (15,run_event))
+            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (5,run_event))
         elif self.args.test == 4:
             t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (30,run_event))            
         elif self.args.test == 5:

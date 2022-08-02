@@ -45,7 +45,13 @@ if __name__ == "__main__":
         from animations.animation_bar import AnimationBar
         lf = AnimationBar(command_line_args)
     elif command_line_args.animation == 3: 
-        from animations.animation_signal_strength import AnimationSignal
+        from animations.animation_bar_counter import AnimationBarCounter
+        lf = AnimationBarCounter(command_line_args)    
+    elif command_line_args.animation == 4: 
+        from animations.animation_bar_counter_transition import AnimationBarCounterTransition
+        lf = AnimationBarCounterTransition(command_line_args)    
+    elif command_line_args.animation == 5: 
+        from animations.animation_signal import AnimationSignal
         lf = AnimationSignal(command_line_args)
     else:
         print("Please select a valid animation.")
