@@ -27,11 +27,11 @@ if __name__ == "__main__":
     parser.add_argument("--led-panel-type", action="store", help="Needed to initialize special panels. Supported: 'FM6126A'", default="", type=str)
 
     # Leezenflow arguments
-    parser.add_argument("--receiver", action="store", help="How are messages received. 0=None, 1=MQTT, 2=UDP", default=0, type=int)
-    parser.add_argument("--test", action="store", help="Use test dataset.", default=-1, type=int)
+    parser.add_argument("--receiver", action="store", help="How messages should be received. 0=None, 1=MQTT, 2=UDP", default=0, type=int)
+    parser.add_argument("--test", action="store", help="Use a test dataset (instead of using live data via a receiver).", default=-1, type=int)
     parser.add_argument("--logging", action="store", help="1=Log all messages. Default:0 ", default=0, type=int)
-    parser.add_argument("--stats", action="store", help="1=Store phase changes of month to csv. Default:0 ", default=0, type=int)
-    parser.add_argument("--animation", action="store", help="Select animation: 0-1", default=0, type=int)
+    parser.add_argument("--stats", action="store", help="1=More concise traffic logging. Store phase changes of the current month to csv. Default:0", default=0, type=int)
+    parser.add_argument("--animation", action="store", help="Select animation: 0,1,2,3,...", default=0, type=int)
     parser.add_argument("--modifier", action="store", help="Select a modifier to smooth inaccurate predictions.", default=0, type=int)
 
     command_line_args = parser.parse_args()
