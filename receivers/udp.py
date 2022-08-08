@@ -18,7 +18,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
         try:
             SharedState.statistics.save_message(data)
-        except Exception e:
+        except Exception as e:
             print("Stat logging failed:", e)
 
         shared = SharedState.modifier(shared)
