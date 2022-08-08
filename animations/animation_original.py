@@ -198,6 +198,7 @@ class AnimationOrignal(LeezenflowBase):
                     time.sleep(self.update_interval)
                     if time.monotonic() >= time_wait + 60: # 60 sec w/o expected phase change
                         print("Green phase prediction time ended 60s ago, however no red phase message was received. Leaving green state...",flush=True)
+                        self.matrix.Fill(0,0,0)
                         SharedState.shared_data["current_phase"] = "awaiting_message"
                         break
 
@@ -242,6 +243,7 @@ class AnimationOrignal(LeezenflowBase):
                     time.sleep(0.1)
                     if time.monotonic() >= time_wait + 60: # 60 sec w/o expected phase change
                         print("Red phase prediction time ended 10s ago, however no green phase message was received. Leaving red state...",flush=True)
+                        self.matrix.Fill(0,0,0)
                         SharedState.shared_data["current_phase"] = "awaiting_message"
                         break
 

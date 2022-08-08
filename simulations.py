@@ -2,8 +2,26 @@ import time
 
 from message_interpreter import Interpreter
 from shared_state import SharedState
+import re
 
 class Simulation():    
+
+    # Tests that replays recorded phases
+    def log_simulation(_,run_event):
+        import io
+        with io.open('sample_messages/august1.log','r',encoding='utf8') as f:
+            text = f.read()
+        #spat_xml = re.split("(<SPATEM>)", text)
+        spat_xml = re.findall('[\s\S]*?</SPATEM>', text)
+
+        interpreter = Interpreter()
+
+        for spatem_xml in spat_xml: 
+            time.sleep(0.1) # Test dataset has 10 updates per second -> 0.1
+            SharedState.shared_data = interpreter.interpret_message(spatem_xml)
+            print("Simulated: ",SharedState.shared_data,flush=True)
+            if not run_event.is_set():
+                break    
 
     # Tests that replays recorded phases
     def mqtt_client_simulation(_,run_event):

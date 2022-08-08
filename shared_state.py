@@ -7,3 +7,5 @@ class SharedState:
                 "hash" : 0 
             }
     interpreter = None
+    modifier = None
+    statistics = None

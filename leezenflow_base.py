@@ -20,7 +20,7 @@ class LeezenflowBase(object):
     def __init__(self, command_line_args):
         self.args = command_line_args
 
-    def receiver(self, mode, run_event):
+    def receiver(self, mode, run_event, logging):
         if self.args.modifier == 1:
             from message_modifier import ModifierHoerstertor
             modify = ModifierHoerstertor().smooth
@@ -50,6 +50,11 @@ class LeezenflowBase(object):
             from message_interpreter import InterpreterTest
 
             SharedState.interpreter = InterpreterTest.interpret_message
+            SharedState.modifier = modify
+
+            statistics_tool = StatisticsTool()
+            SharedState.statistics = statistics_tool
+
             client = UDPReceiver(config=config)
             client.run()
 
@@ -107,7 +112,7 @@ class LeezenflowBase(object):
         elif self.args.receiver == 1:
             t2 = threading.Thread(target = self.receiver(mode="mqtt"), args = (None,run_event))
         elif self.args.receiver == 2:
-            t2 = threading.Thread(target = self.receiver, args = ("udp",run_event))
+            t2 = threading.Thread(target = self.receiver, args = ("udp",run_event,logging))
         else:
             raise Exception("Invalid receiver argument.")
 
@@ -129,6 +134,8 @@ class LeezenflowBase(object):
             t2 = threading.Thread(target = Simulation.phase_fast_simulation, args = ("green",run_event))
         elif self.args.test == 7:
             t2 = threading.Thread(target = Simulation.stale_prediction, args = (None,run_event))
+        elif self.args.test == 8:
+            t2 = threading.Thread(target = Simulation.log_simulation, args = (None,run_event))
         else:
             raise Exception("Invalid test argument.")
 

@@ -25,12 +25,12 @@ class AnimationSignal(LeezenflowBase):
         current_hash = 0
 
         while(run_event.is_set()):
-            print(SharedState.shared_data)
+            #print(SharedState.shared_data)
             if current_hash != (current_hash := SharedState.shared_data["hash"]):
                 update_array.append(time.monotonic())
             update_array = [t for t in update_array if (t + time_window) > time.monotonic()]
             messages_in_time_window = len(update_array)
-            print(messages_in_time_window)
+            #print(messages_in_time_window)
 
             canvas.Fill(0,0,0)
             draw_rectangle(x0=0,y0=0, x1=self.MATRIX_WIDTH, y1=min(messages_in_time_window, self.MATRIX_HEIGHT), r=45,g=114,b=135)
