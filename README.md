@@ -11,7 +11,7 @@ The basics are:
 - [32x32 RGB LED Matrix Panel - 5mm Pitch](https://www.adafruit.com/product/2026)
 - [64x32 RGB LED Matrix - 5mm pitch](https://www.adafruit.com/product/2277)
 
-To test the setup we recommend to check out: https://github.com/hzeller/rpi-rgb-led-matrix.\
+To test the setup we recommend to check out: https://github.com/hzeller/rpi-rgb-led-matrix. \
 As stated in the docs, you should disable sound: https://github.com/hzeller/rpi-rgb-led-matrix#bad-interaction-with-sound
 and bridge GPIO Pins 4 and 18 as documented here: https://github.com/hzeller/rpi-rgb-led-matrix#improving-flicker
 
@@ -35,14 +35,22 @@ sudo make install-python PYTHON=$(command -v python3)
 - Check an example by running `sudo python runtext.py` in directory `rpi-rgb-led-matrix/bindings/python/samples/`
 - Another example: `sudo python pulsing-brightness.py --led-gpio-mapping=adafruit-hat-pwm --led-cols=96 --led-rows=32`
 - Let's add the Leezenflow code: Clone this repo this to e.g. `/home/pi/`
-- `sudo pip install -r requirements.txt`
-- Start an endless simulation with `sudo python leezenflow.py --test 3`
+- Install Python library to receive MQTT messages: `sudo pip install -r requirements.txt`
+- Start an endless simulation with `sudo python leezenflow.py --test 0`
 
 The implemention assumes you have made the "adafruit-hat-pwm" modification to your hardware.
 
 ## Production usage
 
-- copy `config.ini.example` to `config.ini` and adjust the settings as needed
+- Use `sudo python leezenflow.py --help` to get an overview over command line options.
+- `--receiver` How messages should be received. 0=None, 1=MQTT, 2=UDP
+- `--test` Use a test dataset (instead of using live data via a receiver).
+- `--modifier` Select a modifier to smooth inaccurate predictions.
+- `--animation` Select animation: 0,1,2,3,...
+
+For receiving live data: copy `config.ini.example` to a new file named `config.ini` and adjust the settings as needed
+
+Setup as service such that Leezenflow runs on start:
 - Setup this code to run as a system service, as described in this guide: https://www.raspberrypi.org/documentation/computers/using_linux.html#creating-a-service
 - After testing the service, run: `sudo systemctl enable leezenflow.service` to enable automatic startup after a reboot
 

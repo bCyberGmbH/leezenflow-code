@@ -1,3 +1,5 @@
+# Debug animation: height of bar indicates the number of messages in the last 10 seconds
+
 from leezenflow_base import LeezenflowBase
 from rgbmatrix import graphics
 import time
@@ -26,7 +28,7 @@ class AnimationSignal(LeezenflowBase):
 
         while(run_event.is_set()):
             #print(SharedState.shared_data)
-            if current_hash != (current_hash := SharedState.shared_data["hash"]):
+            if current_hash != (current_hash := hash(str(SharedState.shared_data))):
                 update_array.append(time.monotonic())
             update_array = [t for t in update_array if (t + time_window) > time.monotonic()]
             messages_in_time_window = len(update_array)

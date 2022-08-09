@@ -15,12 +15,6 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
         #print("{} wrote:".format(self.client_address[0]))
 
         shared = SharedState.interpreter(data)
-
-        # try:
-        #     SharedState.statistics.save_message(data)
-        # except Exception as e:
-        #     print("Stat logging failed:", e)
-
         shared = SharedState.modifier(shared)
         SharedState.shared_data = shared
 

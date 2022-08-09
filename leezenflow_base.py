@@ -7,20 +7,16 @@ import threading
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 import configparser
-import logging
-from logging.handlers import RotatingFileHandler
 
 from message_interpreter import Interpreter
-from message_statistics import StatisticsTool
 from simulations import Simulation
-
 from shared_state import SharedState
 
 class LeezenflowBase(object):
     def __init__(self, command_line_args):
         self.args = command_line_args
 
-    def receiver(self, mode, run_event, logging):
+    def receiver(self, mode, run_event):
         if self.args.modifier == 1:
             from message_modifier import ModifierHoerstertor
             modify = ModifierHoerstertor().smooth
@@ -29,7 +25,6 @@ class LeezenflowBase(object):
             modify = lambda x: x # Return value unchanged
 
         interpreter = Interpreter()
-        statistics = StatisticsTool()  
 
         try:    
             config = configparser.ConfigParser()
@@ -39,40 +34,22 @@ class LeezenflowBase(object):
 
         if mode == "mqtt":
             from receivers.mqtt import MQTTReceiver
-            client = MQTTReceiver(config=config, interpreter=interpreter, flag_stats=self.args.logging, statistics=statistics, logging=logging, modify=modify)
+            client = MQTTReceiver(config=config, interpreter=interpreter, modify=modify)
             client.start()
 
             while run_event.is_set():
                 client.loop()
-
         elif mode == "udp":
             from receivers.udp import UDPReceiver
             SharedState.interpreter = interpreter.interpret_message
             SharedState.modifier = modify
 
-            statistics_tool = StatisticsTool()
-            SharedState.statistics = statistics_tool
-
             client = UDPReceiver(config=config)
             client.run()
-
         else:
             print("No messages will be received. Use tests to simulate messages.")
 
     def process(self):
-        log_name = 'log/console.log'
-        if self.args.logging == 1:
-            logging.basicConfig(filename=log_name, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.INFO)
-            print("Writing log to file...",flush=True)
-        elif self.args.logging == 2:
-            logging.basicConfig(filename=log_name, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
-            print("Writing log to file...",flush=True)
-        else:
-            logging.basicConfig(filename=log_name, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.CRITICAL)
-
-        log = logging.getLogger()
-        handler = RotatingFileHandler(log_name, maxBytes=3e+8, backupCount=3) #300MB max
-        log.addHandler(handler)
 
         options = RGBMatrixOptions()
         if self.args.led_gpio_mapping != None:
@@ -102,7 +79,7 @@ class LeezenflowBase(object):
         run_event = threading.Event()
         run_event.set()
 
-        # Start animation
+        # Thread for animation
         t1 = threading.Thread(target = self.run, args = (None,run_event))
 
         if self.args.receiver == 0:
@@ -110,7 +87,7 @@ class LeezenflowBase(object):
         elif self.args.receiver == 1:
             t2 = threading.Thread(target = self.receiver(mode="mqtt"), args = (None,run_event))
         elif self.args.receiver == 2:
-            t2 = threading.Thread(target = self.receiver, args = ("udp",run_event,logging))
+            t2 = threading.Thread(target = self.receiver, args = ("udp",run_event))
         else:
             raise Exception("Invalid receiver argument.")
 
@@ -119,9 +96,9 @@ class LeezenflowBase(object):
         elif self.args.test == 0:
             t2 = threading.Thread(target = Simulation.phase_switch_simulation_4_phases, args = (5,run_event))
         elif self.args.test == 1:
-            t2 = threading.Thread(target = Simulation.mqtt_client_simulation, args = (None,run_event))
+            t2 = threading.Thread(target = Simulation.mqtt_log, args = (None,run_event))
         elif self.args.test == 2:
-            t2 = threading.Thread(target = Simulation.mqtt_client_simulation_dataframe, args = (None,run_event))
+            t2 = threading.Thread(target = Simulation.log_simulation, args = (None,run_event))
         elif self.args.test == 3:
             t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (5,run_event))
         elif self.args.test == 4:

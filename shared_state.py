@@ -8,4 +8,3 @@ class SharedState:
             }
     interpreter = None
     modifier = None
-    statistics = None

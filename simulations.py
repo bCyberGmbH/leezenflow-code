@@ -10,7 +10,6 @@ class Simulation():
         import io
         import re
         from message_modifier import ModifierHoerstertor
-        from message_statistics import StatisticsTool
 
         with io.open('sample_messages/august1.log','r',encoding='utf8') as f:
             text = f.read()
@@ -19,20 +18,18 @@ class Simulation():
 
         interpreter = Interpreter()
         modifier = ModifierHoerstertor()
-        stats = StatisticsTool()
 
         for spatem_xml in spat_xml: 
             time.sleep(0.1) # Test dataset has 10 updates per second -> 0.1
             shared = interpreter.interpret_message(spatem_xml)
             #shared = modifier.smooth(shared)
             SharedState.shared_data = shared
-            stats.save_message(spatem_xml)
-            #print("Simulated: ",SharedState.shared_data,flush=True)
+            print("Simulated: ",SharedState.shared_data,flush=True)
             if not run_event.is_set():
                 break    
 
     # Tests that replays recorded phases
-    def mqtt_client_simulation(_,run_event):
+    def mqtt_log(_,run_event):
         import io
         with io.open('sample_messages/spat.log','r',encoding='utf8') as f:
             text = f.read()
@@ -47,39 +44,6 @@ class Simulation():
             print("Simulated: ",SharedState.shared_data,flush=True)
             if not run_event.is_set():
                 break    
-
-    # Tests that replays recorded phases
-    def mqtt_client_simulation_dataframe(_,run_event):
-        import pickle
-        import pandas as pd
-        from message_modifier import ModifierHoerstertor
-
-        df = pickle.load( open( "sample_messages/log8.p", "rb" ) )
-        df = df[df.signalGroup == "33"]
-        df = df.drop_duplicates(subset='xml_file', keep='first')
-        df['time'] = pd.to_datetime(df['time'])
-
-        modify = ModifierHoerstertor().smooth
-
-        for i in range(len(df)):
-            time.sleep(0.1) # Test dataset has 10 updates per second -> 0.1
-            row = df.iloc[i,:]
-
-            current_time = time.monotonic()
-            shared_data = {
-                "current_phase" : row.current_phase,
-                "current_timestamp" : current_time,
-                "change_timestamp" : current_time + int(row.remaining_time),
-                "hash" : row.current_phase + str(row.likelyTime)
-            }
-
-            #SharedState.shared_data = shared_data
-            SharedState.shared_data = modify(shared_data)
-
-            print("Simulated: ",SharedState.shared_data,flush=True)
-
-            if not run_event.is_set():
-                break 
 
     # Tests a continous phase switch with fixed time
     def phase_switch_simulation(target,run_event):

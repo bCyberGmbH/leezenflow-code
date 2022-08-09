@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 from shared_state import SharedState
 
 class MQTTReceiver:
-    def __init__(self, config, interpreter, flag_stats, statistics, logging, modify):
+    def __init__(self, config, interpreter, modify):
         self.mqtt_server_ip = config['mqtt']['server_ip']
         self.mqtt_server_port = int(config['mqtt']['server_port'])
         self.mqtt_topic =  config['mqtt']['topic']
@@ -13,9 +13,6 @@ class MQTTReceiver:
         self.mqtt_client_pw = config['mqtt']['client_pw']
 
         self.interpreter = interpreter
-        self.flag_stats = flag_stats
-        self.statistics = statistics
-        self.logging = logging
         self.modify = modify
 
     def on_connect(self, client, userdata, flags, rc):
@@ -28,12 +25,8 @@ class MQTTReceiver:
 
     def on_message(self, client, userdata, msg):
         shared_data = self.interpreter.interpret_message(str(msg.payload, "utf-8"))
-        if self.flag_stats:
-            self.statistics.save_message(shared_data)
         SharedState.shared_data =self.modify(shared_data)
 
-        self.logging.info("Processed: " + str(SharedState.shared_data))    
-        self.logging.debug(str(msg.payload, "utf-8"))
         print("Processed:",SharedState.shared_data,flush=True)
 
     def start(self)      
