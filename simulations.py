@@ -10,6 +10,7 @@ class Simulation():
         import io
         import re
         from message_modifier import ModifierHoerstertor
+        from message_statistics import StatisticsTool
 
         with io.open('sample_messages/august1.log','r',encoding='utf8') as f:
             text = f.read()
@@ -18,12 +19,14 @@ class Simulation():
 
         interpreter = Interpreter()
         modifier = ModifierHoerstertor()
+        stats = StatisticsTool()
 
         for spatem_xml in spat_xml: 
             time.sleep(0.1) # Test dataset has 10 updates per second -> 0.1
             shared = interpreter.interpret_message(spatem_xml)
             #shared = modifier.smooth(shared)
             SharedState.shared_data = shared
+            stats.save_message(spatem_xml)
             #print("Simulated: ",SharedState.shared_data,flush=True)
             if not run_event.is_set():
                 break    
