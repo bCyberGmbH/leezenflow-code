@@ -103,10 +103,7 @@ class AnimationBar(LeezenflowBase):
 
         ### Start the loop ###
         while(run_event.is_set()):
-
-            canvas.Fill(150,30,30)
-            time.sleep(100)
-        
+   
             ## Green phase ##
             if SharedState.shared_data["current_phase"] == "green" or SharedState.shared_data["current_phase"] == "red-yellow":
                 draw_phase("green","red-yellow",g1,g2,g3)
