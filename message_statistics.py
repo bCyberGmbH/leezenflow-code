@@ -63,6 +63,6 @@ class StatisticsTool():
 
             self.switch_file_name()
 
-        except Exception:
-            print("Statistic logging failed...")
+        except Exception as e:
+            print("Statistic logging failed...", e)
 

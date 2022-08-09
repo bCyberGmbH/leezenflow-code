@@ -13,19 +13,16 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
         data = self.request[0].strip()
         socket = self.request[1]
         #print("{} wrote:".format(self.client_address[0]))
-        #print(data)
+
         shared = SharedState.interpreter(data)
 
-        try:
-            SharedState.statistics.save_message(data)
-        except Exception as e:
-            print("Stat logging failed:", e)
+        # try:
+        #     SharedState.statistics.save_message(data)
+        # except Exception as e:
+        #     print("Stat logging failed:", e)
 
         shared = SharedState.modifier(shared)
         SharedState.shared_data = shared
-
-        #print(SharedState.shared_data)
-        #SharedState.logging.info(data)   
 
 class UDPReceiver:
     def __init__(self, config): 

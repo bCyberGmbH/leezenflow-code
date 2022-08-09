@@ -47,9 +47,7 @@ class LeezenflowBase(object):
 
         elif mode == "udp":
             from receivers.udp import UDPReceiver
-            from message_interpreter import InterpreterTest
-
-            SharedState.interpreter = InterpreterTest.interpret_message
+            SharedState.interpreter = interpreter.interpret_message
             SharedState.modifier = modify
 
             statistics_tool = StatisticsTool()
