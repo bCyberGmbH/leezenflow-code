@@ -57,6 +57,7 @@ class AnimationOrignal(LeezenflowBase):
                     self.matrix.SetPixel(row, pixel, r/shade_intensity, g/shade_intensity, b/shade_intensity)
 
         def draw_black_trend_rectangle(y1,y2,r,g,b):
+            y1 -= self.bias
             y2 -= self.bias
             length = self.length_shade # How many shaded pixel?
             r1 = r/length
