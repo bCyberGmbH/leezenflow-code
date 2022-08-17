@@ -70,5 +70,5 @@ WantedBy=multi-user.target
 `ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/leezenflow.py --animation 0 --test 4`
 - Reload: `sudo systemctl daemon-reload`
 - After testing the service with `sudo systemctl start leezenflow.service`, run: `sudo systemctl enable leezenflow.service` to enable automatic startup after a reboot.
-- The service can be stopped with: `sudo systemctl stop leezenflow.service `
+- The service can be stopped with: `sudo systemctl stop leezenflow.service`
 - Reminder: Do not forget to use the `python -u` (as used above) flag in your service definition to prevent logging problems
