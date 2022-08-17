@@ -40,6 +40,12 @@ sudo make install-python PYTHON=$(command -v python3)
 
 The implemention assumes you have made the "adafruit-hat-pwm" modification to your hardware.
 
+## Animations
+| ID: 0  | ID:  1  | ID: 2  | ID: 3 | ID: 4 |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| Original Leezenflow animation. While green, the bike moves. Once the phase turns red, the bike stops. | New concept developed during the Münsterhack 2021 hackathon. The idea is that the cyclist will get to the green traffic light in time, when the bike on the LED is in the green window while the cyclist passes the device. The white arrows (right side) could be placed on the physical road for additional orientation. | Decreasing bar using the full size of the LED matrix. The bar can only decrease, i.e., it is not possible that a new (longer) phase change prediction increases the size of the bar. | Decreasing bar with an additonal numeric countdown. Note that live traffic data might not yield smoothly decreasing prediction values, i.e., the digits might jump in an unintuitive way. In this case, the implementation of a new customized message modifier might help. | Experimental animation where the color of the countdown changes from black to green/red. |
+| ![](animations/animation_original.jpg) | ![](animations/animation_mshack.jpg) | ![](animations/animation_bar.jpg)  | ![](animations/animation_counter_white.jpg) | ![](animations/animation_counter_transition.jpg) |
+
 ## Production usage
 
 - Use `sudo python leezenflow.py --help` to get an overview over command line options.
