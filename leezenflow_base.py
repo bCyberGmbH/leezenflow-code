@@ -3,10 +3,10 @@ import time
 import sys
 import os
 import threading
-
-sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
-from rgbmatrix import RGBMatrix, RGBMatrixOptions
 import configparser
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
+
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
 from message_interpreter import Interpreter
 from simulations import Simulation
@@ -17,40 +17,40 @@ class LeezenflowBase(object):
         self.args = command_line_args
 
     def receiver(self, mode, run_event):
+        interpreter = Interpreter()
+
+        # Modify incomming messages (e.g. to smooth values)
         if self.args.modifier == 1:
             from message_modifier import ModifierHoerstertor
             modify = ModifierHoerstertor().smooth
         else:
             print("No modifier selected.")
             modify = lambda x: x # Return value unchanged
-
-        interpreter = Interpreter()
-
+ 
+        # Read config.ini
         try:    
             config = configparser.ConfigParser()
             config.read('config.ini')
         except KeyError:
             print("Configuration file or values within missing...")
 
+        # Select SPATEM message receiver 
         if mode == "mqtt":
             from receivers.mqtt import MQTTReceiver
             client = MQTTReceiver(config=config, interpreter=interpreter, modify=modify)
             client.start()
-
             while run_event.is_set():
                 client.loop()
         elif mode == "udp":
             from receivers.udp import UDPReceiver
             SharedState.interpreter = interpreter.interpret_message
             SharedState.modifier = modify
-
             client = UDPReceiver(config=config)
             client.run()
         else:
             print("No messages will be received. Use tests to simulate messages.")
 
     def process(self):
-
         options = RGBMatrixOptions()
         if self.args.led_gpio_mapping != None:
           options.hardware_mapping = self.args.led_gpio_mapping
@@ -72,7 +72,6 @@ class LeezenflowBase(object):
             options.gpio_slowdown = self.args.led_slowdown_gpio
         if self.args.led_no_hardware_pulse:
           options.disable_hardware_pulsing = True
-
         self.matrix = RGBMatrix(options = options)
 
         # Initialize threading
@@ -82,6 +81,7 @@ class LeezenflowBase(object):
         # Thread for animation
         t1 = threading.Thread(target = self.run, args = (None,run_event))
 
+        # Select receiver
         if self.args.receiver == 0:
             pass
         elif self.args.receiver == 1:
@@ -91,6 +91,7 @@ class LeezenflowBase(object):
         else:
             raise Exception("Invalid receiver argument.")
 
+        # Select test mode 
         if self.args.test == -1:
             pass
         elif self.args.test == 0:
@@ -120,7 +121,7 @@ class LeezenflowBase(object):
         try:
             t2.start()
         except UnboundLocalError:
-            print("Aborted. Use flag --test 0 to run with test dataset.")
+            print("Cannot run without either test dataset or receiver. Use flag --test 0 to run with test dataset 0.")
 
         try:
             while True:

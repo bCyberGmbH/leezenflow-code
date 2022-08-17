@@ -50,8 +50,25 @@ The implemention assumes you have made the "adafruit-hat-pwm" modification to yo
 
 For receiving live data: copy `config.ini.example` to a new file named `config.ini` and adjust the settings as needed
 
-Setup as service such that Leezenflow runs on start:
-- Setup this code to run as a system service, as described in this guide: https://www.raspberrypi.org/documentation/computers/using_linux.html#creating-a-service
-- After testing the service, run: `sudo systemctl enable leezenflow.service` to enable automatic startup after a reboot
-
-**Reminder: do not forget to use the `python3 -u` flag in your service definition to prevent logging problems**
+Setup the leezenflow.py script as service such that Leezenflow runs on start:
+- `cd /etc/systemd/system`
+- Create file: `sudo touch leezenflow.service`
+- Edit file: `sudo nano leezenflow.service`
+- Enter (for example) the following:
+```
+[Unit]
+Description=Start leezenflow listening on UDP messages on boot with Hoerstertor modifier
+After=multi-user.target
+[Service]
+WorkingDirectory=/home/pi/leezenflow-code
+ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/leezenflow.py --animation 0 --receiver 2 --modifier 1
+User=root
+[Install]
+WantedBy=multi-user.target
+```
+- This starts animation `0` with the UDP listener and modifier `1` on start. In order to run the animation with test data you can use:
+`ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/leezenflow.py --animation 0 --test 4`
+- Reload: `sudo systemctl daemon-reload`
+- After testing the service with `sudo systemctl start leezenflow.service`, run: `sudo systemctl enable leezenflow.service` to enable automatic startup after a reboot.
+- The service can be stopped with: `sudo systemctl stop leezenflow.service `
+- Reminder: Do not forget to use the `python -u` (as used above) flag in your service definition to prevent logging problems

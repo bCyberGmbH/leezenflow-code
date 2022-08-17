@@ -1,5 +1,6 @@
 # This animation was created during the Münsterhack 2021.
 # Idea: You will make it in time when the bike is inside the green window while your passing the LED
+# Co-authored by: moritzmhmk
 
 import time
 from rgbmatrix import graphics
