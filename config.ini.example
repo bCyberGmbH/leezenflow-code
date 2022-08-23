@@ -6,3 +6,6 @@ client_name = leezenflow-pi
 use_auth = no
 client_user_name = user
 client_pw = pw
+[udp]
+server_ip = 0.0.0.0
+server_port = 9977
