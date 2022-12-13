@@ -24,7 +24,7 @@ class Simulation():
             shared = interpreter.interpret_message(spatem_xml)
             #shared = modifier.smooth(shared)
             SharedState.shared_data = shared
-            print("Simulated: ",SharedState.shared_data,flush=True)
+            # print("Simulated: ",SharedState.shared_data,flush=True)
             if not run_event.is_set():
                 break    
 

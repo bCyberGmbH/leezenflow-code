@@ -31,6 +31,8 @@ if __name__ == "__main__":
     parser.add_argument("--test", action="store", help="Use a test dataset (instead of using live data via a receiver).", default=-1, type=int)
     parser.add_argument("--animation", action="store", help="Select animation: 0,1,2,3,...", default=0, type=int)
     parser.add_argument("--modifier", action="store", help="Select a modifier to smooth inaccurate predictions.", default=0, type=int)
+    parser.add_argument("--distance", action="store", help="Select a distance between the traffic light and the leezenflow in meters", default=250, type=int)
+    parser.add_argument("--bicycle-speed", action="store", help="Select the average speed from the cyclist between the traffic light and the leezenflow in km/h", default=15, type=int)
 
     command_line_args = parser.parse_args()
     if command_line_args.animation == 0:    
@@ -51,6 +53,9 @@ if __name__ == "__main__":
     elif command_line_args.animation == 5: 
         from animations.animation_signal import AnimationSignal
         lf = AnimationSignal(command_line_args)
+    elif command_line_args.animation == 6: 
+        from animations.animation_manu import AnimationManu
+        lf = AnimationManu(command_line_args)
     else:
         print("Please select a valid animation.")
         
