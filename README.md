@@ -4,7 +4,7 @@
 - Code noch in der Testphase
 - Ich habe zum testen iTerm2 benutzt, da das standard Terminal nicht genügend Farben darstellen kann.
 - Nach Ergänzung der Logik, die nur die veränderten Reihen neu zeichnet, kann nun scheinbar auch die normale VS-Code Bash Konsole benutzt werden.
-- Im Prinzip ist grundsätzlich erstmal alles so geblieben wie es war (habe den Code von der [animation_original] () kopiert) und nur die Logik für die eigene Matrix ergänzt in der neuen Animation [animation_manu] ().
+- Im Prinzip ist grundsätzlich erstmal alles so geblieben wie es war (habe den Code von der [animation_original](https://github.com/Manuel474/Leezenflow_Matrix_Test/blob/06bf679f5fcd510c54531ffebf3de94a1435f206/animations/animation_original.py) kopiert) und nur die Logik für die eigene Matrix ergänzt in der neuen Animation [animation_manu](https://github.com/Manuel474/Leezenflow_Matrix_Test/blob/06bf679f5fcd510c54531ffebf3de94a1435f206/animations/animation_manu.py).
 
 ## Umbau der Animation
 - Zusätzlich wurde erstmal provisorisch eingebaut, dass die LeezenFlow-Ampel wie gewünscht 10 Sekunden früher auf die andere Phase umspringt.
@@ -14,7 +14,7 @@
 - Die Parameter für Abstand von LF-Ampel zu Echter-Ampel und Durchschnittsgeschwindigkeit wurden bereits hinzugefügt aber bisher auch noch nicht verwendet
 
 ## Ausführung
-- Ich habe den Code bei mir auf einen Raspberry gepackt und von da aus ausgeführt und bearbeitet.
+- Ich habe den Code bei mir auf einen Raspberry Pi 3 Model B V1.2 gepackt und von da aus ausgeführt und bearbeitet.
 - Die Logik für das Fahrrad ist noch nicht wirklich ergänzt, weil dafür Funktionen aus dem Repo https://github.com/hzeller/rpi-rgb-led-matrix benutzt wurden. Z.B.: für die Räder folgende: https://github.com/hzeller/rpi-rgb-led-matrix/blob/f88355e46faafb9de7f1e59dd258ab36c7e7b097/lib/graphics.cc#L120
 - Zu Testzwecken habe ich nur die Funktion DrawCircle kopiert und als `DrawCircleForTestMatrix` in python code umgebaut um zumindest die zwei Reifen zu zeichnen.
 - Zum Starten bitte den Befehl `sudo python leezenflow.py --test 2 --animation 6` ausführen
