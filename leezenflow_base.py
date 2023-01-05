@@ -6,15 +6,19 @@ import threading
 import configparser
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
 
-from rgbmatrix import RGBMatrix, RGBMatrixOptions
+#from leezenflow_display import LeezenflowDisplay
 
 from message_interpreter import Interpreter
 from simulations import Simulation
 from shared_state import SharedState
 
+
+
 class LeezenflowBase(object):
-    def __init__(self, command_line_args):
+
+    def __init__(self, command_line_args, display):
         self.args = command_line_args
+        self.display = display
 
     def receiver(self, mode, run_event):
         interpreter = Interpreter()
@@ -51,28 +55,6 @@ class LeezenflowBase(object):
             print("No messages will be received. Use tests to simulate messages.")
 
     def process(self):
-        options = RGBMatrixOptions()
-        if self.args.led_gpio_mapping != None:
-          options.hardware_mapping = self.args.led_gpio_mapping
-        options.rows = self.args.led_rows
-        options.cols = self.args.led_cols
-        options.chain_length = self.args.led_chain
-        options.parallel = self.args.led_parallel
-        options.row_address_type = self.args.led_row_addr_type
-        options.multiplexing = self.args.led_multiplexing
-        options.pwm_bits = self.args.led_pwm_bits
-        options.brightness = self.args.led_brightness
-        options.pwm_lsb_nanoseconds = self.args.led_pwm_lsb_nanoseconds
-        options.led_rgb_sequence = self.args.led_rgb_sequence
-        options.pixel_mapper_config = self.args.led_pixel_mapper
-        options.panel_type = self.args.led_panel_type
-        if self.args.led_show_refresh:
-          options.show_refresh_rate = 1
-        if self.args.led_slowdown_gpio != None:
-            options.gpio_slowdown = self.args.led_slowdown_gpio
-        if self.args.led_no_hardware_pulse:
-          options.disable_hardware_pulsing = True
-        self.matrix = RGBMatrix(options = options)
 
         # Initialize threading
         run_event = threading.Event()
@@ -103,7 +85,7 @@ class LeezenflowBase(object):
         elif self.args.test == 3:
             t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (5,run_event))
         elif self.args.test == 4:
-            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (30,run_event))            
+            t2 = threading.Thread(target = Simulation.phase_switch_simulation, args = (30,run_event))
         elif self.args.test == 5:
             t2 = threading.Thread(target = Simulation.phase_update_simulation, args = ("red",run_event))
         elif self.args.test == 6:

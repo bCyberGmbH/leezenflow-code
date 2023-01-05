@@ -6,8 +6,9 @@ from shared_state import SharedState
 
 class AnimationOrignal(LeezenflowBase):
     def __init__(self, command_line_args):
+        print("a")
         super(AnimationOrignal, self).__init__(command_line_args)
-
+        print("c")
         self.bike_height = None
         self.bike1_position = None
         self.bike2_position = None
