@@ -14,7 +14,4 @@
 - Die Parameter für Abstand von LF-Ampel zu Echter-Ampel und Durchschnittsgeschwindigkeit wurden bereits hinzugefügt aber bisher auch noch nicht verwendet
 
 ## Ausführung
-- Ich habe den Code bei mir auf einen Raspberry Pi 3 Model B V1.2 gepackt und von da aus ausgeführt und bearbeitet.
-- Die Logik für das Fahrrad ist noch nicht wirklich ergänzt, weil dafür Funktionen aus dem Repo https://github.com/hzeller/rpi-rgb-led-matrix benutzt wurden. Z.B.: für die Räder folgende: https://github.com/hzeller/rpi-rgb-led-matrix/blob/f88355e46faafb9de7f1e59dd258ab36c7e7b097/lib/graphics.cc#L120
-- Zu Testzwecken habe ich nur die Funktion DrawCircle kopiert und als `DrawCircleForTestMatrix` in python code umgebaut um zumindest die zwei Reifen zu zeichnen.
-- Zum Starten bitte den Befehl `sudo python leezenflow.py --test 2 --animation 6` ausführen
+- Zum Starten bitte erst den Befehl `sudo python3 leezenflow.py  --animation 6 --display terminal --receiver 2 --distance 100 --bicycle-speed 20` und danach `python3 traffic_light_udp_simulation.py` ausführen
