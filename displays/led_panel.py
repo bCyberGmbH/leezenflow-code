@@ -21,28 +21,30 @@ class LED_Panel(display.AbstractLeezenflowDisplay):
         self.graphics = graphics
 
         options = RGBMatrixOptions()
-        if self.args.led_gpio_mapping != None:
-            options.hardware_mapping = self.args.led_gpio_mapping
-        options.rows = self.args.led_rows
-        options.cols = self.args.led_cols
-        options.chain_length = self.args.led_chain
-        options.parallel = self.args.led_parallel
-        options.row_address_type = self.args.led_row_addr_type
-        options.multiplexing = self.args.led_multiplexing
-        options.pwm_bits = self.args.led_pwm_bits
-        options.brightness = self.args.led_brightness
-        options.pwm_lsb_nanoseconds = self.args.led_pwm_lsb_nanoseconds
-        options.led_rgb_sequence = self.args.led_rgb_sequence
-        options.pixel_mapper_config = self.args.led_pixel_mapper
-        options.panel_type = self.args.led_panel_type
-        if self.args.led_show_refresh:
+        if display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_gpio_mapping != None:
+            options.hardware_mapping = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_gpio_mapping
+        options.rows = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_rows
+        options.cols = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_cols
+        options.chain_length = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_chain
+        options.parallel = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_parallel
+        options.row_address_type = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_row_addr_type
+        options.multiplexing = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_multiplexing
+        options.pwm_bits = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_pwm_bits
+        options.brightness = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_brightness
+        options.pwm_lsb_nanoseconds = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_pwm_lsb_nanoseconds
+        options.led_rgb_sequence = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_rgb_sequence
+        options.pixel_mapper_config = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_pixel_mapper
+        options.panel_type = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_panel_type
+        if display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_show_refresh:
             options.show_refresh_rate = 1
-        if self.args.led_slowdown_gpio != None:
-            options.gpio_slowdown = self.args.led_slowdown_gpio
-        if self.args.led_no_hardware_pulse:
+        if display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_slowdown_gpio != None:
+            options.gpio_slowdown = display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_slowdown_gpio
+        if display.AbstractLeezenflowDisplay.CommandLineArgs.command_line_args.led_no_hardware_pulse:
             options.disable_hardware_pulsing = True
         self.matrix = RGBMatrix(options = options)
         pass
+
+        self.canvas = self.matrix
 
     def GetDisplayType(self):
         print("Display: LED-Panel")

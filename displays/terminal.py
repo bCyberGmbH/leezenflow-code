@@ -164,6 +164,7 @@ class testThread(threading.Thread):
         self.iD = iD
         self.name = name
         self.firstRun = True
+        self.firstLoop = True
         self.cols = 32
         self.rows = 96
         self.values = 3
@@ -171,7 +172,7 @@ class testThread(threading.Thread):
         self.terminalPixelRow = terminalPixelRow
 
     def run(self):
-
+        
         def generate_table():
             current_phase = display.AbstractLeezenflowDisplay.SharedState.shared_data["current_phase"]
 
@@ -216,5 +217,8 @@ class testThread(threading.Thread):
                     self.previousTerminalPixelRow[row][pixel][2] = self.terminalPixelRow[row][pixel][2]
 
         while True:
+            if self.firstLoop:
+                time.sleep(1)
+                self.firstLoop = False
             generate_table()
             time.sleep(0.4)

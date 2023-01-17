@@ -3,6 +3,7 @@ import time
 from leezenflow_base import LeezenflowBase
 
 from shared_state import SharedState
+from command_line_args import CommandLineArgs
 
 class AnimationManu(LeezenflowBase):
     
@@ -51,6 +52,10 @@ class AnimationManu(LeezenflowBase):
         self.testThreadStarted = False
         self.switchedPhase = False
         self.starttime = time.time()
+        self.seconds_to_reach_traffic_light = 0
+        self.bicycle_speed = 0 # in m/s
+        self.distance = 0
+        self.first_initialize = True
 
         #self.display = Display()
 
@@ -59,11 +64,37 @@ class AnimationManu(LeezenflowBase):
         g1,g2,g3 = *self.color_green,
         r1,r2,r3 = *self.color_red,
 
+
+
+        def calculate_seconds_to_reach_traffic_light():
+            # time = distance (in meter) / speed (in m/s)
+            self.bicycle_speed = CommandLineArgs.command_line_args.bicycle_speed / 3.6 # calculate km/h to m/s
+            self.distance = CommandLineArgs.command_line_args.distance
+            if (self.distance > 0 and self.bicycle_speed > 0):
+                self.seconds_to_reach_traffic_light = self.distance / self.bicycle_speed
+                print(self.seconds_to_reach_traffic_light)
+
+        calculate_seconds_to_reach_traffic_light()
+
         def update_current_row():
             if self.last_update_prediction_sec <= 0.1:
                 #print("Prediction <= 0.1", flush=True)
                 return self.matrix_height
             self.current_row = self.last_update_current_row + int(((self.matrix_height - self.last_update_current_row) / self.last_update_prediction_sec) * self.last_update_elapsed_sec)
+
+        def process_predict_update_early_switch(phase):
+            self.last_update_elapsed_time_start = time.monotonic()
+
+            self.current_row = self.bike_box_height
+            self.last_update_current_row = self.current_row
+            self.last_update_elapsed_sec = 0
+            average_phase_time = 0
+            
+            if phase == "red":
+                average_phase_time = self.averageRedPhaseTime
+            else:
+                average_phase_time = self.averageGreenPhaseTime
+            self.last_update_prediction_sec = max(0, average_phase_time + self.seconds_to_reach_traffic_light * 2)
 
         def process_prediction_update():
             self.last_update_current_row = self.current_row
@@ -71,7 +102,7 @@ class AnimationManu(LeezenflowBase):
             if SharedState.shared_data["current_phase"] == "yellow" or SharedState.shared_data["current_phase"] == "red-yellow":
                 self.last_update_prediction_sec = self.placeholder_time_for_short_phases
             else:
-                self.last_update_prediction_sec = max(0, (SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]) - 10 )
+                self.last_update_prediction_sec = max(0, (SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]) - self.seconds_to_reach_traffic_light)
             self.last_update_elapsed_time_start = time.monotonic()
 
         def get_next_bike_step(time_elapsed_bike,last_bike_time):
@@ -111,9 +142,12 @@ class AnimationManu(LeezenflowBase):
             self.start_time_bike = time.monotonic()
             self.time_elapsed_bike = 0
 
-            self.last_update_prediction_sec = max(0, (SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]) - 10)
+            # self.last_update_prediction_sec = max(0, (SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]) - 10)
+            self.last_update_prediction_sec = max(0, (SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]) - self.seconds_to_reach_traffic_light)
             self.last_message = None
-            self.current_row = self.bike_box_height
+            if self.first_initialize == True:
+                self.current_row = self.bike_box_height
+                self.first_initialize = False
             self.last_update_current_row = self.current_row
 
         ### Start the loop ###
@@ -166,17 +200,30 @@ class AnimationManu(LeezenflowBase):
                     time.sleep(self.update_interval)
 
                 self.switchedPhase = True
+                #self.current_row = self.bike_box_height
+                #process_predict_update_early_switch()
+                just_switched = True
+
                 while SharedState.shared_data["current_phase"] == "green" and (self.current_row >= self.matrix_height) and run_event.is_set():
                     self.current_row = self.bike_box_height
-                    self.display.draw_rectangle(self.bike_box_height,self.matrix_height, r1, r2, r3) # pure green
+                    self.display.draw_rectangle(self.bike_box_height,self.matrix_height, r1, r2, r3) # pure red
+                    process_predict_update_early_switch("green")
 
                     while SharedState.shared_data["current_phase"] == "green":
-                        
                         self.time_elapsed_bike = time.monotonic() - self.start_time_bike
                         self.last_update_elapsed_sec = time.monotonic() - self.last_update_elapsed_time_start
 
+
+                        update_current_row()
                         self.display.draw_black_trend_rectangle(0,self.current_row, r1, r2, r3) # Black fade and resetting of bike box
-                        move_bike_red()
+
+                        if self.bike_still_moving:
+                            self.display.draw_black_trend_rectangle(0,self.current_row, r1, r2, r3) # Black fade
+                            move_bike_red()
+                        else:
+                            self.display.draw_bike(self.max_white, self.max_white, self.max_white ,self.bike_height,self.bike_center)
+
+                        
 
                         time.sleep(self.update_interval)
 
@@ -251,12 +298,16 @@ class AnimationManu(LeezenflowBase):
                 while SharedState.shared_data["current_phase"] == "red" and (self.current_row >= self.matrix_height) and run_event.is_set():
                     self.current_row = self.bike_box_height
                     self.display.draw_rectangle(self.bike_box_height,self.matrix_height, g1, g2, g3) # pure green
+                    process_predict_update_early_switch("green")
 
                     while SharedState.shared_data["current_phase"] == "red":
                         self.time_elapsed_bike = time.monotonic() - self.start_time_bike
                         self.last_update_elapsed_sec = time.monotonic() - self.last_update_elapsed_time_start
+                        #self.display.draw_black_trend_rectangle(0,self.current_row, g1, g2, g3) # Black fade and resetting of bike box
                         self.display.draw_black_trend_rectangle(0,self.current_row, g1, g2, g3) # Black fade and resetting of bike box
                         move_bikes_green()
+                        update_current_row()
+                        
                         time.sleep(self.update_interval)
 
 

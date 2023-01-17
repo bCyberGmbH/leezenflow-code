@@ -3,6 +3,7 @@ import abc
 class AbstractLeezenflowDisplay(abc.ABC):
     
     from shared_state import SharedState
+    from command_line_args import CommandLineArgs
 
     @abc.abstractmethod
     def GetDisplayType(self):
