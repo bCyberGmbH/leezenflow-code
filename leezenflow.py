@@ -52,6 +52,11 @@ def create_Display(command_line_args, display_type):
         lf = AnimationManu(command_line_args, display)
         t = threading.Thread(target=lf.process)
         t.start()
+    elif command_line_args.animation == 7:
+        from animations.animation_manu_yellow import AnimationManuYellow
+        lf = AnimationManuYellow(command_line_args, display)
+        t = threading.Thread(target=lf.process)
+        t.start()
     else:
         print("Please select a valid animation.")
 
@@ -85,6 +90,7 @@ if __name__ == "__main__":
     parser.add_argument("--modifier", action="store", help="Select a modifier to smooth inaccurate predictions.", default=0, type=int)
     parser.add_argument("--distance", action="store", help="Select a distance between the traffic light and the leezenflow in meters", default=0, type=int)
     parser.add_argument("--bicycle-speed", action="store", help="Select the average speed from the cyclist between the traffic light and the leezenflow in km/h", default=0, type=int)
+    parser.add_argument("--bicycle-yellow-speed", action="store", help="Select the speed from the cyclist that is needed to reach the traffic light when the leezenflow shows yellow in km/h", default=0, type=int)
     parser.add_argument("--display", action="append", help="Select the output. If not specified, 'led_panel' will be selected. Possible options: 'terminal' or 'led_panel'")
 
     command_line_args = parser.parse_args()

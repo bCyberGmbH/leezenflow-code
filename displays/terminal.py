@@ -125,20 +125,20 @@ class Terminal(display.AbstractLeezenflowDisplay):
                 x0, x1 = x1, x0
                 y0, y1 = y1, y0
             gradient = (dy << shift) / dx
-            for x in range(x0, x1+1):
-                y = 0x8000 + (y0 << shift)
-                y += gradient
+            y = round(0x8000 + (y0 << shift))
+            for x in range(x0, x1 + 1):
                 self.setPixel(round(x), round(y) >> shift, r, g, b)
+                y += gradient
         elif dy != 0:
             # y variation is bigger than x variation
             if y1 < y0:
                 x0, x1 = x1, x0
                 y0, y1 = y1, y0
             gradient = (dx << shift) / dy
-            for y in range(y0, y1+1):
-                x = 0x8000 + (x0 << shift)
-                x += gradient
+            x = round(0x8000 + (x0 << shift))
+            for y in range(y0, y1 + 1):
                 self.setPixel(round(x) >> shift,  round(y), r, g, b)
+                x += gradient
         else:
             self.setPixel(round(x0), round(y0), r, g, b)
 
@@ -146,6 +146,8 @@ class Terminal(display.AbstractLeezenflowDisplay):
         r = self.__clamp(r, 0, 255)
         g = self.__clamp(g, 0, 255)
         b = self.__clamp(b, 0, 255)
+        if row >  95 or pixel > 31 or pixel < 0 or row < 0:
+            return
         row = self.__clamp(row, 0, 95)
         pixel = self.__clamp(pixel, 0, 31)
 

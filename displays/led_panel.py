@@ -86,7 +86,7 @@ class LED_Panel(display.AbstractLeezenflowDisplay):
             for pixel in range(0,32):
                 self.setPixel(row, pixel, r1/2, g1/2, b1/2) # Dark green/red
 
-    def draw_bike(self, r, g, b, y_position, axis_x_left, moving = False):
+    def draw_bike(self, r, g, b, y_position, axis_x_left, moving = False): # 8, 1..2..3..4
 
         color = self.graphics.Color(255, 255, 255)
 

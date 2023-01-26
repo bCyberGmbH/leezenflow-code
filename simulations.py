@@ -11,7 +11,8 @@ class Simulation():
         import re
         from message_modifier import ModifierHoerstertor
 
-        with io.open('sample_messages/august1.log','r',encoding='utf8') as f:
+        #with io.open('sample_messages/august1.log','r',encoding='utf8') as f:
+        with io.open('sample_messages/august1_double.log','r',encoding='utf8') as f:
             text = f.read()
         #spat_xml = re.split("(<SPATEM>)", text)
         spat_xml = re.findall('[\s\S]*?</SPATEM>', text)
