@@ -11,7 +11,7 @@ class AnimationOriginalYellow(LeezenflowBase):
         super(AnimationOriginalYellow, self).__init__(command_line_args, display)
 
         self.display = display
-
+        #test
         self.bike_height = None
         self.bike1_position = None
         self.bike2_position = None
