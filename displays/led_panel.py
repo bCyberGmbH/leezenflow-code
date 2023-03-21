@@ -5,7 +5,6 @@ import os.path
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 from displays import display
-#from rgbmatrix import RGBMatrix, RGBMatrixOptions, graphics # rgbMatrix
 
 class LED_Panel(display.AbstractLeezenflowDisplay):
     cols = 32

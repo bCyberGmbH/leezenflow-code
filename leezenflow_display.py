@@ -10,11 +10,8 @@ class LeezenflowDisplay():
     def setOutput(self,value):
         if (value == "led_panel"):
             self.display = led_panel.LED_Panel()
-            # self.display.GetDisplayType()
         elif (value == "terminal"):
             self.display = terminal.Terminal()
-            # self.display.GetDisplayType()
         else:
             self.display = led_panel.LED_Panel()
-            # self.display.GetDisplayType()
         self.display.GetDisplayType()

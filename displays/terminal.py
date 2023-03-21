@@ -16,14 +16,14 @@ class Terminal(display.AbstractLeezenflowDisplay):
 
     def __init__(self):
         self.terminalPixelRow = [[[0 for k in range(self.values)] for j in range(self.cols)] for i in range(self.rows)]
-        t3 = testThread(1 , "a", self.terminalPixelRow)
+        t3 = TerminalThread(1 , "Terminal", self.terminalPixelRow)
         t3.start()
 
     def GetDisplayType(self):
         print("Display: Terminal")
 
     def setPixel(self, row, pixel, r, g, b):
-        self.__setTestMatrixPixel(row, pixel, r, g, b)
+        self.__setTerminalMatrixPixel(row, pixel, r, g, b)
 
     def Fill(self, r, g, b):
         for row in range(0, self.rows):
@@ -67,8 +67,8 @@ class Terminal(display.AbstractLeezenflowDisplay):
         axis_x_middle = axis_x_left + 7
         axis_x_right = axis_x_left + 15
         radius = 5
-        self.__DrawCircle(axis_y, axis_x_left, radius, 255, 255, 255) # testMatrix
-        self.__DrawCircle(axis_y, axis_x_right, radius, 255, 255, 255) # testMatrix
+        self.__DrawCircle(axis_y, axis_x_left, radius, 255, 255, 255)
+        self.__DrawCircle(axis_y, axis_x_right, radius, 255, 255, 255)
 
         if moving:
             # Speed lines
@@ -142,7 +142,7 @@ class Terminal(display.AbstractLeezenflowDisplay):
         else:
             self.setPixel(round(x0), round(y0), r, g, b)
 
-    def __setTestMatrixPixel(self, row, pixel, r, g, b):
+    def __setTerminalMatrixPixel(self, row, pixel, r, g, b):
         r = self.__clamp(r, 0, 255)
         g = self.__clamp(g, 0, 255)
         b = self.__clamp(b, 0, 255)
@@ -160,7 +160,7 @@ class Terminal(display.AbstractLeezenflowDisplay):
         return max(min(maxn, n), minn)
 
 
-class testThread(threading.Thread):
+class TerminalThread(threading.Thread):
     def __init__(self, iD, name, terminalPixelRow):
         threading.Thread.__init__(self)
         self.iD = iD

@@ -5,10 +5,10 @@ from leezenflow_base import LeezenflowBase
 from shared_state import SharedState
 from command_line_args import CommandLineArgs
 
-class AnimationManuYellow(LeezenflowBase):
+class AnimationOriginalYellow(LeezenflowBase):
     
     def __init__(self, command_line_args, display):
-        super(AnimationManuYellow, self).__init__(command_line_args, display)
+        super(AnimationOriginalYellow, self).__init__(command_line_args, display)
 
         self.display = display
 
@@ -38,19 +38,15 @@ class AnimationManuYellow(LeezenflowBase):
         self.last_update_elapsed_sec = None
         self.last_update_elapsed_time_start = None
 
-        # variables manu
         self.lastGreenPhaseTime = -1
         self.averageGreenPhaseTime = -1
         self.greenPhaseArray = []
         self.greenPhasesToSave = 10
-        self.greenPhaseCounter = -1
         self.lastRedPhaseTime = -1
         self.averageRedPhaseTime = -1
         self.redPhaseArray = []
         self.redPhasesToSave = 10
-        self.redPhaseCounter = -1
         self.firstRun = True
-        self.testThreadStarted = False
         self.switchedPhase = False
         self.starttime = time.time()
         self.seconds_to_reach_traffic_light = 0
@@ -61,8 +57,6 @@ class AnimationManuYellow(LeezenflowBase):
         self.distance = 0
         self.first_initialize = True
         self.eary_switch_current_phase = None
-
-        #self.display = Display()
 
     def run(self,_,run_event):
 
@@ -218,7 +212,6 @@ class AnimationManuYellow(LeezenflowBase):
                         self.last_message = SharedState.shared_data["hash"]
 
                         if SharedState.shared_data["current_phase"] == "green":
-                            # ToDo -->
                             self.lastGreenPhaseTime = max(0, SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"])
                             if len(self.greenPhaseArray) >= self.greenPhasesToSave:
                                 self.greenPhaseArray.pop(0)
@@ -227,7 +220,6 @@ class AnimationManuYellow(LeezenflowBase):
                             for x in self.greenPhaseArray:
                                 self.averageGreenPhaseTime += x
                             self.averageGreenPhaseTime = self.averageGreenPhaseTime / len(self.greenPhaseArray)
-                            # <-- ToDo
 
                     time.sleep(self.update_interval)
 
@@ -333,7 +325,6 @@ class AnimationManuYellow(LeezenflowBase):
                         self.last_message = SharedState.shared_data["hash"]
 
                         if SharedState.shared_data["current_phase"] == "red":
-                            # ToDo -->
                             self.lastRedPhaseTime = max(0, SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"])
                             if len(self.redPhaseArray) >= self.redPhasesToSave:
                                 self.redPhaseArray.pop(0)
@@ -342,7 +333,6 @@ class AnimationManuYellow(LeezenflowBase):
                             for x in self.redPhaseArray:
                                 self.averageRedPhaseTime += x
                             self.averageRedPhaseTime = self.averageRedPhaseTime / len(self.redPhaseArray)
-                            # <-- ToDo
 
                     time.sleep(self.update_interval)
 

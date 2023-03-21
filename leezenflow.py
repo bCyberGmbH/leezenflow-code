@@ -5,7 +5,6 @@ import threading
 from leezenflow_base import LeezenflowBase
 from leezenflow_display import LeezenflowDisplay
 from command_line_args import CommandLineArgs
-#from rgbmatrix import graphics
 
 def create_Display(command_line_args, display_type):
 
@@ -18,43 +17,23 @@ def create_Display(command_line_args, display_type):
     display = leezenflowDisplay.display
 
     if command_line_args.animation == 0:
-        from animations.animation_original import AnimationOrignal
-        lf = AnimationOrignal(command_line_args)
+        from animations.animation_original import AnimationOriginal
+        lf = AnimationOriginal(command_line_args, display)
         t = threading.Thread(target=lf.process)
         t.start()
     elif command_line_args.animation == 1:
-        from animations.animation_mshack import AnimationMSHACK
-        lf = AnimationMSHACK(command_line_args)
-        t = threading.Thread(target=lf.process)
-        t.start()
-    elif command_line_args.animation == 2:
-        from animations.animation_bar import AnimationBar
-        lf = AnimationBar(command_line_args)
-        t = threading.Thread(target=lf.process)
-        t.start()
-    elif command_line_args.animation == 3:
-        from animations.animation_bar_counter import AnimationBarCounter
-        lf = AnimationBarCounter(command_line_args)
-        t = threading.Thread(target=lf.process)
-        t.start()
-    elif command_line_args.animation == 4:
-        from animations.animation_bar_counter_transition import AnimationBarCounterTransition
-        lf = AnimationBarCounterTransition(command_line_args)
-        t = threading.Thread(target=lf.process)
-        t.start()
-    elif command_line_args.animation == 5:
-        from animations.animation_signal import AnimationSignal
-        lf = AnimationSignal(command_line_args)
+        from animations.animation_original_yellow import AnimationOriginalYellow
+        lf = AnimationOriginalYellow(command_line_args, display)
         t = threading.Thread(target=lf.process)
         t.start()
     elif command_line_args.animation == 6:
-        from animations.animation_manu import AnimationManu
-        lf = AnimationManu(command_line_args, display)
+        from animations.animation_original import AnimationOriginal
+        lf = AnimationOriginal(command_line_args, display)
         t = threading.Thread(target=lf.process)
         t.start()
     elif command_line_args.animation == 7:
-        from animations.animation_manu_yellow import AnimationManuYellow
-        lf = AnimationManuYellow(command_line_args, display)
+        from animations.animation_original_yellow import AnimationOriginalYellow
+        lf = AnimationOriginalYellow(command_line_args, display)
         t = threading.Thread(target=lf.process)
         t.start()
     else:
