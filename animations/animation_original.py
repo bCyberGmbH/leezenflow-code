@@ -145,7 +145,7 @@ class AnimationOriginal(LeezenflowBase):
 
             self.last_update_prediction_sec = max(0, (SharedState.shared_data["change_timestamp"] - SharedState.shared_data["current_timestamp"]) - self.seconds_to_reach_traffic_light)
             self.last_message = None
-            if self.first_initialize == True:
+            if self.first_initialize == True or self.seconds_to_reach_traffic_light == 0:
                 self.current_row = self.bike_box_height
                 self.first_initialize = False
             self.last_update_current_row = self.current_row
