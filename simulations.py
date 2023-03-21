@@ -11,7 +11,8 @@ class Simulation():
         import re
         from message_modifier import ModifierHoerstertor
 
-        with io.open('sample_messages/august1.log','r',encoding='utf8') as f:
+        #with io.open('sample_messages/august1.log','r',encoding='utf8') as f:
+        with io.open('sample_messages/august1_double.log','r',encoding='utf8') as f:
             text = f.read()
         #spat_xml = re.split("(<SPATEM>)", text)
         spat_xml = re.findall('[\s\S]*?</SPATEM>', text)
@@ -24,7 +25,7 @@ class Simulation():
             shared = interpreter.interpret_message(spatem_xml)
             #shared = modifier.smooth(shared)
             SharedState.shared_data = shared
-            print("Simulated: ",SharedState.shared_data,flush=True)
+            # print("Simulated: ",SharedState.shared_data,flush=True)
             if not run_event.is_set():
                 break    
 

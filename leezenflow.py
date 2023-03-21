@@ -1,8 +1,44 @@
 import time
 import argparse
+import threading
 
 from leezenflow_base import LeezenflowBase
-from rgbmatrix import graphics
+from leezenflow_display import LeezenflowDisplay
+from command_line_args import CommandLineArgs
+
+def create_Display(command_line_args, display_type):
+
+    CommandLineArgs.command_line_args = command_line_args
+
+    leezenflowDisplay = LeezenflowDisplay()
+
+    leezenflowDisplay.setOutput(display_type)
+
+    display = leezenflowDisplay.display
+
+    if command_line_args.animation == 0:
+        from animations.animation_original import AnimationOriginal
+        lf = AnimationOriginal(command_line_args, display)
+        t = threading.Thread(target=lf.process)
+        t.start()
+    elif command_line_args.animation == 1:
+        from animations.animation_original_yellow import AnimationOriginalYellow
+        lf = AnimationOriginalYellow(command_line_args, display)
+        t = threading.Thread(target=lf.process)
+        t.start()
+    elif command_line_args.animation == 6:
+        from animations.animation_original import AnimationOriginal
+        lf = AnimationOriginal(command_line_args, display)
+        t = threading.Thread(target=lf.process)
+        t.start()
+    elif command_line_args.animation == 7:
+        from animations.animation_original_yellow import AnimationOriginalYellow
+        lf = AnimationOriginalYellow(command_line_args, display)
+        t = threading.Thread(target=lf.process)
+        t.start()
+    else:
+        print("Please select a valid animation.")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -31,29 +67,18 @@ if __name__ == "__main__":
     parser.add_argument("--test", action="store", help="Use a test dataset (instead of using live data via a receiver).", default=-1, type=int)
     parser.add_argument("--animation", action="store", help="Select animation: 0,1,2,3,...", default=0, type=int)
     parser.add_argument("--modifier", action="store", help="Select a modifier to smooth inaccurate predictions.", default=0, type=int)
+    parser.add_argument("--distance", action="store", help="Select a distance between the traffic light and the leezenflow in meters", default=0, type=int)
+    parser.add_argument("--bicycle-speed", action="store", help="Select the average speed from the cyclist between the traffic light and the leezenflow in km/h", default=0, type=int)
+    parser.add_argument("--bicycle-yellow-speed", action="store", help="Select the speed from the cyclist that is needed to reach the traffic light when the leezenflow shows yellow in km/h", default=0, type=int)
+    parser.add_argument("--display", action="append", help="Select the output. If not specified, 'led_panel' will be selected. Possible options: 'terminal' or 'led_panel'")
 
     command_line_args = parser.parse_args()
-    if command_line_args.animation == 0:    
-        from animations.animation_original import AnimationOrignal
-        lf = AnimationOrignal(command_line_args)
-    elif command_line_args.animation == 1: 
-        from animations.animation_mshack import AnimationMSHACK
-        lf = AnimationMSHACK(command_line_args)
-    elif command_line_args.animation == 2: 
-        from animations.animation_bar import AnimationBar
-        lf = AnimationBar(command_line_args)
-    elif command_line_args.animation == 3: 
-        from animations.animation_bar_counter import AnimationBarCounter
-        lf = AnimationBarCounter(command_line_args)    
-    elif command_line_args.animation == 4: 
-        from animations.animation_bar_counter_transition import AnimationBarCounterTransition
-        lf = AnimationBarCounterTransition(command_line_args)    
-    elif command_line_args.animation == 5: 
-        from animations.animation_signal import AnimationSignal
-        lf = AnimationSignal(command_line_args)
+
+    if (command_line_args.display != None and len(command_line_args.display) >= 1):
+        for x in range(len(command_line_args.display)):
+            create_Display(command_line_args, command_line_args.display[x])
     else:
-        print("Please select a valid animation.")
-        
-    if (not lf.process()):
-        lf.print_help()
+        create_Display(command_line_args, "led_panel")
+
+
 
