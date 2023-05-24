@@ -1,3 +1,4 @@
+# Description: Build the rpi-rgb-led-matrix library and python wheel.
 #!/usr/bin/env bash
 
 REPO_PATH="build/rpi-rgb-led-matrix"
