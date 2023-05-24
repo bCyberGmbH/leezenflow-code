@@ -41,6 +41,28 @@ sudo make install-python PYTHON=$(command -v python3)
 
 The implemention assumes you have made the "adafruit-hat-pwm" modification to your hardware.
 
+## Development setup
+
+1. Create virtual environment: `python -m venv env`
+2. Build python wheel for `rgbmatrix`:
+
+    ```bash
+    sudo apt-get install python3-dev python3-pillow -y
+    ./scripts/build_rgbmatrix.sh
+    ```
+    This will place the built wheel in the subfolder `lib/`, which `requirements-dev.txt` points to.
+3. Install development dependencies (within virtual environment): 
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Install `leezenflow` package in editable mode (within virtual environment): 
+
+    ```bash
+    pip install -e .
+    ```
+
 ## Animations
 | ID: 0  | ID:  1  | ID: 2  | ID: 3 | ID: 4 |
 | ------------- | ------------- | ------------- | ------------- | ------------- |

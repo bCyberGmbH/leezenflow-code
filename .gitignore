@@ -3,3 +3,11 @@ __pycache__/
 config.ini
 config2.ini
 log/all.log
+
+# python
+env/
+*.egg-info/
+
+# building dependencies
+build/
+lib/
