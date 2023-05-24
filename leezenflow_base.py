@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__) + "/.."))
 
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
-from message_interpreter import Interpreter
+from leezenflow.message_interpreter import Interpreter
 from shared_state import SharedState
 from simulations import Simulation
 

@@ -4,7 +4,7 @@ import io
 import re
 import time
 
-from message_interpreter import Interpreter
+from leezenflow.message_interpreter import Interpreter
 from message_modifier import ModifierHoerstertor
 from shared_state import SharedState
 
