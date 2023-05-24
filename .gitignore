@@ -1,5 +1,13 @@
-__pycache__/
-.vscode/
+# config
 config.ini
 config2.ini
+
+# logs
 log/all.log
+
+# ide
+.vscode/
+
+# python
+__pycache__/
+/env/
