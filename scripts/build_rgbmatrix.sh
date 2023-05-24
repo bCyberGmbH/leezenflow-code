@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+REPO_PATH="build/rpi-rgb-led-matrix"
+
 # clone git repository
 mkdir build
-git clone https://github.com/hzeller/rpi-rgb-led-matrix.git build/rpi-rgb-led-matrix
+git clone https://github.com/hzeller/rpi-rgb-led-matrix.git $REPO_PATH
 
 # build C library
-make -C build/rpi-rgb-led-matrix build-python PYTHON=$(which python3)
+make -C $REPO_PATH build-python PYTHON=$(which python3)
 
 # build python wheel
-pip wheel build/rpi-rgb-led-matrix/bindings/python -w lib
+pip wheel $REPO_PATH/bindings/python -w lib
