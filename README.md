@@ -18,25 +18,26 @@ and bridge GPIO Pins 4 and 18 as documented here: https://github.com/hzeller/rpi
 ![image](https://user-images.githubusercontent.com/66736282/131323333-051d12f2-3675-4559-b143-b1451a63ec5d.png)
 Source: https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/img/adafruit-mod.jpg
 
-## Installation
-- For initializing your Raspberry Pi with an operating system, install the official Raspberry PI imager (we used version v.1.7.2) on a computer with a microSD card reader. Plug in an empty microSD card and select Raspberry Pi OS (other) -> Raspberry Raspberry Pi OS Lite (32-Bit). We used version 2022-04-04. Make sure that you activate SSH.
-- Find out the ip address of your Raspberry Pi and connect to it using `ssh pi@IPADDRESS`.
-- Install git, e.g. using `sudo apt update` and `sudo apt install git`.
-- Install pip, e.g. using `sudo apt-get install python3-pip`
-- Clone [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) to e.g. `/home/pi/`
-- You can adjust the Makefile if you made any hardware modifications. See: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/bindings/python 
-- Build the library. First, change directories into `rpi-rgb-led-matrix/bindings/python/`. Then:
+## Setup on Raspberry PI
+
+1. For initializing your Raspberry Pi with an operating system, install the official Raspberry PI imager (we used version v.1.7.2) on a computer with a microSD card reader. Plug in an empty microSD card and select Raspberry Pi OS (other) -> Raspberry Raspberry Pi OS Lite (32-Bit). We used version 2022-04-04. Make sure that you activate SSH.
+2. Find out the ip address of your Raspberry Pi and connect to it using `ssh pi@IPADDRESS`.
+3. Install git, e.g. using `sudo apt update` and `sudo apt install git`.
+4. Install pip, e.g. using `sudo apt-get install python3-pip`
+5. Clone [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) to e.g. `/home/pi/`
+6. You can adjust the Makefile if you made any hardware modifications. See: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/bindings/python 
+7. Build the library. First, change directories into `rpi-rgb-led-matrix/bindings/python/`. Then:
 ```
 sudo apt-get update && sudo apt-get install python3-dev python3-pillow -y
 make build-python PYTHON=$(command -v python3)
 sudo make install-python PYTHON=$(command -v python3)
 ```
-- Deactivate the sound module as described in the readme of https://github.com/hzeller/rpi-rgb-led-matrix.
-- Check an example by running `sudo python runtext.py` in directory `rpi-rgb-led-matrix/bindings/python/samples/`
-- Another example: `sudo python pulsing-brightness.py --led-gpio-mapping=adafruit-hat-pwm --led-cols=96 --led-rows=32`
-- Let's add the Leezenflow code: Clone this repo this to e.g. `/home/pi/`
-- Install Python library to receive MQTT messages: `sudo pip install -r requirements.txt`
-- Start an endless simulation with `sudo python leezenflow.py --test 0`
+8. Deactivate the sound module as described in the readme of https://github.com/hzeller/rpi-rgb-led-matrix.
+9. Check an example by running `sudo python runtext.py` in directory `rpi-rgb-led-matrix/bindings/python/samples/`
+10. Another example: `sudo python pulsing-brightness.py --led-gpio-mapping=adafruit-hat-pwm --led-cols=96 --led-rows=32`
+11. Let's add the Leezenflow code: Clone this repo this to e.g. `/home/pi/`
+12. Install Python library to receive MQTT messages: `sudo pip install -r requirements.txt`
+13. Start an endless simulation with `sudo python leezenflow.py --test 0`
 
 The implemention assumes you have made the "adafruit-hat-pwm" modification to your hardware.
 
