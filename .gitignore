@@ -1,5 +1,14 @@
-__pycache__/
-.vscode/
+# config
 config.ini
-config2.ini
-log/all.log
+
+# logs
+log/**
+sample_messages/**
+
+# python
+__pycache__/
+env/
+venv/
+*.egg-info
+.pytest_cache/
+.DS_Store

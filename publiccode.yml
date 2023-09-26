@@ -1,0 +1,54 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+categories:
+  - data-visualization
+description:
+  de:
+    documentation: 'https://smartcity.ms/leezenflow'
+    features:
+      - dynamische Anzeige von Ampelphasendauer
+    genericName: Ampelsoftware
+    longDescription: |2
+       Angenommen man fährt mit dem Fahrrad auf eine Ampel zu und weiß, wann  sie umschaltet. So kann man seine Geschwindigkeit anpassen, um komfortabel und im „Flow“ bei Grün durchzufahren. Das ist die Idee hinter dem Grüne-Welle-Assistent Leezenflow: Auf einer digitalen Anzeige sieht man anhand des Farbverlaufs bereits mehrere Meter vor der  nächsten Straßenkreuzung, wie lange die aktuelle Ampelphase noch andauert. Dadurch kann jede/r Radfahrer:in die Geschwindigkeit individuell anpassen und kommt flüssiger und sicherer ans Ziel. Der Leezenflow ist mit der jeweiligen Fahrradampel verbunden und ändert die Länge des Farbverlaufs dynamisch. Das System bietet nicht nur mehr Komfort, sondern führt im Idealfall zu weniger Rotlichtverstößen. 
+    shortDescription: |-
+      Grüne-Welle-Assistent für den Radverkehr: Auf einer Anzeige sieht man vor der
+      nächsten Ampel wie lange die aktuelle Ampelphase noch andauert.
+  en:
+    features:
+      - dynamic visualization of the duration of traffic light sequences
+    genericName: software for traffic lights
+    longDescription: |2
+       Assume, you ride with the bicycle towards a traffic light and you know when this traffic light switches to the next color. With this knowledge, you can adapt your velocity to pass the junction with comfort and in the flow. That's the idea behinde the green-wave-assistent Leezenflow: The color and duration of the current traffic light sequence is visualized on a display several meters ahead of a junction with a traffic light. So, every cyclist can adapt his or her velocity on an individual basis and is able to get to his or her destination more smoothly. Leezenflow is connected with the corresponding traffic light for cyclist and changes the visu
+       in a dynamic way. The system not only provides more comfort for cyclists but ideally also more safety because of less red light violations.
+    shortDescription: |-
+      Green-wave-assistent für bicycles: Ahead of the next traffic light, 
+      a display shows the color and duration of the current traffic light sequence  
+developmentStatus: stable
+intendedAudience:
+  scope:
+    - transportation
+legal:
+  license: GPL-3.0-or-later
+  mainCopyrightOwner: bCyber Gmbh
+  repoOwner: bCyber GmbH
+localisation:
+  availableLanguages:
+    - de
+  localisationReady: false
+maintenance:
+  contacts:
+    - email: basti@bcyber.de
+      name: Bastian Bleker
+  type: internal
+name: Leezenflow
+platforms:
+  - linux
+releaseDate: '2023-09-26'
+softwareType: standalone/other
+softwareVersion: v2.0.0
+url: 'https://github.com/bCyberGmbH/leezenflow-code'
+usedBy:
+  - Stadt Münster

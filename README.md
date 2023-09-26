@@ -2,6 +2,23 @@
 
 This repo contains the (python) code to run [Leezenflow](https://github.com/bCyberGmbH/leezenflow-doku). It includes a script to parse the traffic light data (message_interpreter.py) and the animation (leezenflow.py).
 
+## License
+
+Copyright (C) 2021-2023 bCyber GmbH
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 ## Requirements
 
 The hardware setup is described in detail in this [guide](https://github.com/bCyberGmbH/leezenflow-doku/blob/main/case.md).
@@ -18,43 +35,51 @@ and bridge GPIO Pins 4 and 18 as documented here: https://github.com/hzeller/rpi
 ![image](https://user-images.githubusercontent.com/66736282/131323333-051d12f2-3675-4559-b143-b1451a63ec5d.png)
 Source: https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/img/adafruit-mod.jpg
 
-## Installation
-- For initializing your Raspberry Pi with an operating system, install the official Raspberry PI imager (we used version v.1.7.2) on a computer with a microSD card reader. Plug in an empty microSD card and select Raspberry Pi OS (other) -> Raspberry Raspberry Pi OS Lite (32-Bit). We used version 2022-04-04. Make sure that you activate SSH.
-- Find out the ip address of your Raspberry Pi and connect to it using `ssh pi@IPADDRESS`.
-- Install git, e.g. using `sudo apt update` and `sudo apt install git`.
-- Install pip, e.g. using `sudo apt-get install python3-pip`
-- Clone [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) to e.g. `/home/pi/`
-- You can adjust the Makefile if you made any hardware modifications. See: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/bindings/python 
-- Build the library. First, change directories into `rpi-rgb-led-matrix/bindings/python/`. Then:
+## Setup on Raspberry PI
+
+1. For initializing your Raspberry Pi with an operating system, install the official Raspberry PI imager (we used version v.1.7.2) on a computer with a microSD card reader. Plug in an empty microSD card and select Raspberry Pi OS (other) -> Raspberry Raspberry Pi OS Lite (32-Bit). We used version 2022-04-04. Make sure that you activate SSH.
+2. Find out the ip address of your Raspberry Pi and connect to it using `ssh pi@IPADDRESS`.
+3. Install git, e.g. using `sudo apt update` and `sudo apt install git`.
+4. Install pip, e.g. using `sudo apt-get install python3-pip`
+5. Clone [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) to e.g. `/home/pi/`
+6. You can adjust the Makefile if you made any hardware modifications. See: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/bindings/python 
+7. Build the library. First, change directories into `rpi-rgb-led-matrix/bindings/python/`. Then:
 ```
 sudo apt-get update && sudo apt-get install python3-dev python3-pillow -y
 make build-python PYTHON=$(command -v python3)
 sudo make install-python PYTHON=$(command -v python3)
 ```
-- Deactivate the sound module as described in the readme of https://github.com/hzeller/rpi-rgb-led-matrix.
-- Check an example by running `sudo python runtext.py` in directory `rpi-rgb-led-matrix/bindings/python/samples/`
-- Another example: `sudo python pulsing-brightness.py --led-gpio-mapping=adafruit-hat-pwm --led-cols=96 --led-rows=32`
-- Let's add the Leezenflow code: Clone this repo this to e.g. `/home/pi/`
-- Install Python library to receive MQTT messages: `sudo pip install -r requirements.txt`
-- Start an endless simulation with `sudo python leezenflow.py --test 0`
+8. Deactivate the sound module as described in the readme of https://github.com/hzeller/rpi-rgb-led-matrix.
+9. Check an example by running `sudo python runtext.py` in directory `rpi-rgb-led-matrix/bindings/python/samples/`
+10. Another example: `sudo python pulsing-brightness.py --led-gpio-mapping=adafruit-hat-pwm --led-cols=96 --led-rows=32`
+11. Let's add the Leezenflow code: Clone this repo this to e.g. `/home/pi/`
+12. Install Python library to receive MQTT messages: `sudo pip install -r requirements.txt`
 
 The implemention assumes you have made the "adafruit-hat-pwm" modification to your hardware.
 
-## Animations
-| ID: 0  | ID:  1  | ID: 2  | ID: 3 | ID: 4 |
-| ------------- | ------------- | ------------- | ------------- | ------------- |
-| Original Leezenflow animation. While green, the bike moves. Once the phase turns red, the bike stops. | New concept developed during the Münsterhack 2021 hackathon. The idea is that the cyclist will get to the green traffic light in time, when the bike on the LED is in the green window while the cyclist passes the device. The white arrows (right side) could be placed on the physical road for additional orientation. | Decreasing bar using the full size of the LED matrix. The bar can only decrease, i.e., it is not possible that a new (longer) phase change prediction increases the size of the bar. | Decreasing bar with an additonal numeric countdown. Note that live traffic data might not yield smoothly decreasing prediction values, i.e., the digits might jump in an unintuitive way. In this case, the implementation of a new customized message modifier might help. | Experimental animation where the color of the countdown changes from black to green/red. |
-| <img src="animations/animation_original.jpg" style="width:120px; height:297px;"> | <img src="animations/animation_mshack.jpg" style="width:120px; height:297px;"> | <img src="animations/animation_bar.jpg" style="width:120px; height:297px;"> | <img src="animations/animation_counter_white.jpg" style="width:120px; height:297px;"> | <img src="animations/animation_counter_transition.jpg" style="width:120px; height:297px;"> |
+## Development setup
+
+1. Create virtual environment: `python -m venv venv`
+2. Install dependencies (within virtual environment):
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. Install `leezenflow` package in editable mode (within virtual environment): 
+
+    ```bash
+    pip install -e .
+    ```
+4. (optional) Run unit tests, which are located in folder `tests`:
+
+    ```bash
+    pytest tests
+    ```
 
 ## Production usage
 
 - Use `sudo python leezenflow.py --help` to get an overview over command line options.
-- `--receiver` How messages should be received. 0=None, 1=MQTT, 2=UDP
-- `--test` Use a test dataset (instead of using live data via a receiver).
-- `--modifier` Select a modifier to smooth inaccurate predictions.
-- `--animation` Select animation: 0,1,2,3,...
-
-For receiving live data: copy `config.ini.example` to a new file named `config.ini` and adjust the settings as needed
 
 Setup the leezenflow.py script as service such that Leezenflow runs on start:
 - `cd /etc/systemd/system`
@@ -63,17 +88,16 @@ Setup the leezenflow.py script as service such that Leezenflow runs on start:
 - Enter (for example) the following:
 ```
 [Unit]
-Description=Start leezenflow listening on UDP messages on boot with Hoerstertor modifier
+Description=Start leezenflow
 After=multi-user.target
 [Service]
 WorkingDirectory=/home/pi/leezenflow-code
-ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/leezenflow.py --animation 0 --receiver 2 --modifier 1
+ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/leezenflow.py --your-settings
 User=root
 [Install]
 WantedBy=multi-user.target
 ```
-- This starts animation `0` with the UDP listener and modifier `1` on start. In order to run the animation with test data you can use:
-`ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/leezenflow.py --animation 0 --test 4`
+
 - Reload: `sudo systemctl daemon-reload`
 - After testing the service with `sudo systemctl start leezenflow.service`, run: `sudo systemctl enable leezenflow.service` to enable automatic startup after a reboot.
 - The service can be stopped with: `sudo systemctl stop leezenflow.service`
