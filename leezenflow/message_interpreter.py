@@ -129,6 +129,10 @@ def _parse_xml(
 
         likely_time = int(likely_time_node.text)
 
+        # todo: handle this better
+        if likely_time > 36000:
+            raise ParseError("unusable likely_time value > 36000")
+
         confidence = movement_event_node.find("timing/confidence")
         if confidence is None or confidence.text is None:
             raise ParseError("confidence not found!")
