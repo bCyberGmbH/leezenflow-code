@@ -77,7 +77,14 @@ The implemention assumes you have made the "adafruit-hat-pwm" modification to yo
     pytest tests
     ```
 
-## Production usage
+## Production usage (on Raspberry PI)
+
+Run the following commands in the `leezenflow-code` directory:
+
+```bash
+sudo pip install -r requirements.txt
+sudo pip install -e .
+```
 
 - Use `sudo python leezenflow.py --help` to get an overview over command line options.
 
