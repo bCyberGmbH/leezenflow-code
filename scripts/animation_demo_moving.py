@@ -56,12 +56,12 @@ demo_distance = 195
 demo_normal_speed = 18.3
 demo_fast_speed = 25
 
-demo_green_phase_time = 17
+demo_green_phase_time = 52
 demo_yellow_phase_time = 8
-demo_red_phase_time = 65
+demo_red_phase_time = 30
 
 phase_start_time = 0
-current_phase_time = 65
+current_phase_time = 0
 time_since_last_phase_start = 0
 
 current_phase = DisplayPhase.RED
