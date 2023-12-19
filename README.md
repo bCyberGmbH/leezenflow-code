@@ -1,6 +1,6 @@
 # Leezenflow Source Code
 
-This repo contains the (python) code to run [Leezenflow](https://github.com/bCyberGmbH/leezenflow-doku). It includes a script to parse the traffic light data (message_interpreter.py) and the animation (leezenflow.py).
+This repo contains the (python) code to run [Leezenflow](https://github.com/bCyberGmbH/leezenflow-doku).
 
 ## License
 
@@ -77,6 +77,16 @@ The implemention assumes you have made the "adafruit-hat-pwm" modification to yo
     pytest tests
     ```
 
+5. (optional) You can see a demo animation in your terminal with:
+   
+   ```bash
+   sudo python leezenflow-code/scripts/animation_demo_moving.py --display terminal
+   ```
+
+## Terminal output
+If you want to see the output in your terminal, you need to use a terminal that supports true color.
+We suggest [iTerm2](https://iterm2.com/) or [Kitty](https://sw.kovidgoyal.net/kitty/). You should also zoom out (or reduce the font size) quite a bit, depending on your display size, before starting, to see the full animation.
+
 ## Production usage (on Raspberry PI)
 
 Run the following commands in the `leezenflow-code` directory:
@@ -86,9 +96,9 @@ sudo pip install -r requirements.txt
 sudo pip install -e .
 ```
 
-- Use `sudo python leezenflow.py --help` to get an overview over command line options.
+- Use `sudo python scripts/main.py --help` to get an overview over command line options.
 
-Setup the leezenflow.py script as service such that Leezenflow runs on start:
+Setup the main.py script as service such that Leezenflow runs on start:
 - `cd /etc/systemd/system`
 - Create file: `sudo touch leezenflow.service`
 - Edit file: `sudo nano leezenflow.service`
@@ -99,7 +109,7 @@ Description=Start leezenflow
 After=multi-user.target
 [Service]
 WorkingDirectory=/home/pi/leezenflow-code
-ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/leezenflow.py --your-settings
+ExecStart=/usr/bin/python -u /home/pi/leezenflow-code/scripts/main.py --your-settings
 User=root
 [Install]
 WantedBy=multi-user.target
