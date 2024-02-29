@@ -32,7 +32,7 @@ class MQTTReceiverCounterThread(threading.Thread):
         threading.Thread.__init__(self)
         self.mqtt_server_ip = "127.0.0.1"
         self.mqtt_server_port = 1883
-        self.mqtt_topic = "/spat"
+        self.mqtt_topic = "/spat/#"
         self.mqtt_client_name = "leezenflow-pi"
         self.mqtt_use_auth = "no"
         self.mqtt_client_user_name = ""

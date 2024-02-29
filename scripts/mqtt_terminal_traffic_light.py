@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     # ---
     # RECEIVER THREAD
-    receiver_thread = MQTTReceiverThread()
+    receiver_thread = MQTTReceiverThread(cli_args.lsa_id)
 
     receiver_thread.start()
 

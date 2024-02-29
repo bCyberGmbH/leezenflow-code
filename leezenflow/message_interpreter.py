@@ -4,6 +4,7 @@ from datetime import timedelta
 import logging
 import time
 import xml.etree.ElementTree as ET
+
 import re
 from xml.etree.ElementTree import ParseError
 
@@ -58,15 +59,12 @@ def _parse_xml(
         signal_group: Signal group to be extacted.
 
     Raises:
-        ParseError: Raised if root tag is not SPATEM.
-        ValueError: Raised if signal_group in XML is not valid.
+        ParseError: Raised if root tag is not DATA.
         AttributeError: Raised if tag in XML is not found with 'root.find'.
 
     Returns:
         MessageContentRaw: Dataclass with selected content.
     """
-
-    # parse XML tree
 
     movement_events = []
 
@@ -77,15 +75,16 @@ def _parse_xml(
 
     lsa_id = int(result.group(1))
 
+    # parse XML tree
     tree = ET.ElementTree(ET.fromstring(message))
 
     root = tree.getroot()
 
     if root.tag != "DATA":
-        raise ParseError("root tag is not SPATEM")
+        raise ParseError("root tag is not DATA")
 
     if not root.find("SPAT"):
-        raise ParseError("root tag is not SPATEM")
+        raise ParseError("contains no SPAT element")
 
     movement_state_node = root.find(
         f"SPAT/intersections/IntersectionState/states/MovementState[signalGroup='{signal_group}']"  # noqa: E501
