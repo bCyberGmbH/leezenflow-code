@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # ---
     # RECEIVER THREAD
     if cli_args.receiver == "mqtt":
-        receiver_thread = MQTTReceiverThread()
+        receiver_thread = MQTTReceiverThread(cli_args.lsa_id)
     elif cli_args.receiver == "simulation":
         receiver_thread = SimulationThread()
     else:

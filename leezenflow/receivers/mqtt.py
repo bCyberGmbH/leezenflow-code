@@ -6,11 +6,11 @@ from leezenflow.message_interpreter import Interpreter
 
 
 class MQTTReceiverThread(threading.Thread):
-    def __init__(self, on_message_function=None):
+    def __init__(self, lsa_id, on_message_function=None):
         threading.Thread.__init__(self)
         self.mqtt_server_ip = "127.0.0.1"
         self.mqtt_server_port = 1883
-        self.mqtt_topic = "/spat"
+        self.mqtt_topic = "/spat/" + str(lsa_id)
         self.mqtt_use_auth = "no"
         self.mqtt_client_user_name = ""
         self.mqtt_client_pw = ""

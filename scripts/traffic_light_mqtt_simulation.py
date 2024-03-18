@@ -80,7 +80,9 @@ with open(LOG_FILE) as f:
                 continue
             handle_timing(parsed_message)
             display_spat(parsed_message)
-            client.publish("/spat", current_message_string)
+            client.publish(
+                "/spat/" + str(command_line_args.lsa_id), current_message_string
+            )
             current_message_string = line
         else:
             current_message_string += line
