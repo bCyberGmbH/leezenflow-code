@@ -2,6 +2,7 @@ import logging
 import sys
 import argparse
 import time
+from datetime import datetime
 import threading
 import paho.mqtt.client as mqtt
 import re
@@ -43,6 +44,7 @@ class MQTTReceiverCounterThread(threading.Thread):
         self.start_time = 0
         self.lsa_id = command_line_args.lsa_id
         self.mode = command_line_args.mode
+        self.date_format = "%a %b %d %H:%M:%S %Y"
 
     def on_connect(self, client, userdata, flags, rc):
         logging.info("mqtt topic: " + str(self.mqtt_topic))
@@ -95,7 +97,7 @@ class MQTTReceiverCounterThread(threading.Thread):
     def interval_output(self, elapsed_time):
         if elapsed_time >= 60:
             messages_per_minute = receiver.message_count / (elapsed_time / 60)
-            print(f"Messages per minute: {messages_per_minute:.2f}")
+            print(f"{datetime.now().strftime(receiver.date_format)} Messages per minute: {messages_per_minute:.2f}")
             self.start_time = time.time()
             receiver.message_count = 0
         else:
