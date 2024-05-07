@@ -34,12 +34,11 @@ class MQTTReceiverCounterThread(threading.Thread):
         self.mqtt_server_ip = "127.0.0.1"
         self.mqtt_server_port = 1883
         self.mqtt_topic = "/spat/#"
-        self.mqtt_client_name = "leezenflow-pi"
         self.mqtt_use_auth = "no"
         self.mqtt_client_user_name = ""
         self.mqtt_client_pw = ""
         self.on_message_function_override = on_message_function
-        self.client = mqtt.Client(client_id=self.mqtt_client_name)
+        self.client = mqtt.Client()
         self.message_count = 0
         self.start_time = 0
         self.lsa_id = command_line_args.lsa_id
@@ -97,7 +96,9 @@ class MQTTReceiverCounterThread(threading.Thread):
     def interval_output(self, elapsed_time):
         if elapsed_time >= 60:
             messages_per_minute = receiver.message_count / (elapsed_time / 60)
-            print(f"{datetime.now().strftime(receiver.date_format)} Messages per minute: {messages_per_minute:.2f}")
+            print(
+                f"{datetime.now().strftime(receiver.date_format)} Messages per minute: {messages_per_minute:.2f}"
+            )
             self.start_time = time.time()
             receiver.message_count = 0
         else:
