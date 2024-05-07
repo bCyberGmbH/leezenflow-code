@@ -159,7 +159,7 @@ class CommandLineArgs:
             parser.add_argument(
                 "--display",
                 help="Select the output device (Default: led_panel)",
-                choices=["led_panel", "terminal"],
+                choices=["led_panel", "terminal", "none"],
                 default="led_panel",
                 type=str,
             )
