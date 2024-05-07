@@ -1,7 +1,7 @@
 import time
 from enum import Enum
 from leezenflow.phase import DisplayPhase
-from leezenflow.displays import led_panel, terminal
+from leezenflow.displays import led_panel, terminal, dummy_display
 from leezenflow.command_line_args import CommandLineArgs
 
 
@@ -17,6 +17,8 @@ display_arg = command_line_args.display
 
 if display_arg == "led_panel":
     display = led_panel.LED_Panel()
+elif display_arg == "none":
+    display = dummy_display.DummyDisplay()
 else:
     display = terminal.Terminal()
 

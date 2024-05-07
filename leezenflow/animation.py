@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Optional
 
 from leezenflow.command_line_args import CommandLineArgs
-from leezenflow.displays import led_panel, terminal
+from leezenflow.displays import led_panel, terminal, dummy_display
 import leezenflow.shared_state as shared_state
 from leezenflow.phase import DisplayPhase
 from leezenflow.display_logic import DisplayLogic
@@ -25,6 +25,8 @@ class Animation:
 
         if display_arg == "led_panel":
             display = led_panel.LED_Panel()
+        elif display_arg == "none":
+            display = dummy_display.DummyDisplay()
         else:
             display = terminal.Terminal()
 

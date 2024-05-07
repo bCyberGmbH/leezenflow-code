@@ -1,4 +1,2 @@
 pydantic==1.10.8
 paho-mqtt==1.6.1
-# development requirements
-pytest==7.3.1

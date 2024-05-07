@@ -29,17 +29,15 @@ command_line_args = parser.parse_args()
 
 
 class MQTTReceiverCounterThread(threading.Thread):
-    def __init__(self, on_message_function=None):
+    def __init__(self):
         threading.Thread.__init__(self)
         self.mqtt_server_ip = "127.0.0.1"
         self.mqtt_server_port = 1883
         self.mqtt_topic = "/spat/#"
-        self.mqtt_client_name = "leezenflow-pi"
         self.mqtt_use_auth = "no"
         self.mqtt_client_user_name = ""
         self.mqtt_client_pw = ""
-        self.on_message_function_override = on_message_function
-        self.client = mqtt.Client(client_id=self.mqtt_client_name)
+        self.client = mqtt.Client()
         self.message_count = 0
         self.start_time = 0
         self.lsa_id = command_line_args.lsa_id
@@ -69,11 +67,7 @@ class MQTTReceiverCounterThread(threading.Thread):
             )
 
         self.client.on_connect = self.on_connect
-
-        if self.on_message_function_override is not None:
-            self.client.on_message = self.on_message_function_override
-        else:
-            self.client.on_message = self.on_message
+        self.client.on_message = self.on_message
 
         self.client.connect(
             self.mqtt_server_ip, self.mqtt_server_port, 65535
@@ -97,16 +91,19 @@ class MQTTReceiverCounterThread(threading.Thread):
     def interval_output(self, elapsed_time):
         if elapsed_time >= 60:
             messages_per_minute = receiver.message_count / (elapsed_time / 60)
-            print(f"{datetime.now().strftime(receiver.date_format)} Messages per minute: {messages_per_minute:.2f}")
+            print(
+                f"{int(time.time())} {datetime.now().strftime(receiver.date_format)} Messages per minute: {messages_per_minute:.2f}"
+            )
             self.start_time = time.time()
             receiver.message_count = 0
-        else:
-            sys.stdout.write("\033[K")
-            print("Wait for 60 seconds..", end="\r")
 
 
 receiver = MQTTReceiverCounterThread()
 receiver.start()
+
+print(
+    f"{int(time.time())} {datetime.now().strftime(receiver.date_format)} SCRIPT START"
+)
 
 try:
     receiver.start_time = time.time()
