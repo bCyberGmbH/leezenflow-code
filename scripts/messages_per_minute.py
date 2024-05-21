@@ -16,15 +16,6 @@ parser.add_argument(
     required=True,
 )
 
-parser.add_argument(
-    "--mode",
-    action="store",
-    help="Select the Output Mode.",
-    choices=["live", "interval"],
-    type=str,
-    required=True,
-)
-
 command_line_args = parser.parse_args()
 
 
@@ -39,10 +30,12 @@ class MQTTReceiverCounterThread(threading.Thread):
         self.mqtt_client_pw = ""
         self.client = mqtt.Client()
         self.message_count = 0
-        self.start_time = 0
+        self.start_time = 0.0
         self.lsa_id = command_line_args.lsa_id
-        self.mode = command_line_args.mode
         self.date_format = "%a %b %d %H:%M:%S %Y"
+        self.current_minute = datetime.now().minute
+        self.messages_in_current_minute = 0
+        self.font_color = "\x1b[0m"
 
     def on_connect(self, client, userdata, flags, rc):
         logging.info("mqtt topic: " + str(self.mqtt_topic))
@@ -78,24 +71,23 @@ class MQTTReceiverCounterThread(threading.Thread):
     def stop(self):
         self.client.disconnect()
 
-    def live_output(self, elapsed_time):
-        receive_messages = (
-            receiver.message_count / (elapsed_time) * 60 if elapsed_time > 0 else 0
-        )
-        sys.stdout.write("\033[K")
-        print(
-            f"Messages per minute: {receive_messages:.2f} | Received: {receiver.message_count} Optimal: {elapsed_time:.0f}",
-            end="\r",
-        )
-
-    def interval_output(self, elapsed_time):
-        if elapsed_time >= 60:
-            messages_per_minute = receiver.message_count / (elapsed_time / 60)
+    def output(self):
+        if datetime.now().minute != self.current_minute:
+            print(" -", self.messages_in_current_minute)
             print(
-                f"{int(time.time())} {datetime.now().strftime(receiver.date_format)} Messages per minute: {messages_per_minute:.2f}"
+                datetime.now().strftime(receiver.date_format), "- ", end="", flush=True
             )
-            self.start_time = time.time()
-            receiver.message_count = 0
+            self.current_minute = datetime.now().minute
+            self.messages_in_current_minute = 0
+
+        if receiver.message_count == 0:
+            self.font_color = "\x1b[1;33;40m"
+        else:
+            self.font_color = "\x1b[0m"
+
+        print(f"{self.font_color}{receiver.message_count}\x1b[0m|", end="", flush=True)
+        self.messages_in_current_minute += receiver.message_count
+        receiver.message_count = 0
 
 
 receiver = MQTTReceiverCounterThread()
@@ -105,18 +97,17 @@ print(
     f"{int(time.time())} {datetime.now().strftime(receiver.date_format)} SCRIPT START"
 )
 
+print(datetime.now().strftime(receiver.date_format), "- ", end="", flush=True)
+
 try:
-    receiver.start_time = time.time()
+
+    elapsed_time = 0.0
 
     while True:
-        time.sleep(1)
-
+        receiver.start_time = time.time()
+        receiver.output()
         elapsed_time = time.time() - receiver.start_time
-
-        if receiver.mode == "live":
-            receiver.live_output(elapsed_time)
-        else:
-            receiver.interval_output(elapsed_time)
+        time.sleep(1 - elapsed_time)
 
 except KeyboardInterrupt:
     receiver.stop()
