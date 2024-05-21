@@ -12,9 +12,12 @@ from leezenflow.message_interpreter import (
     Interpreter,
     _parse_xml,
     MessageContentRaw,
+    MessageContentParsed,
+    convert_raw_message_to_parsed,
     _calculate_remaining_phase_seconds,
 )
-from leezenflow.message_types import MovementEventRaw
+from leezenflow.message_types import MovementEventParsed, MovementEventRaw
+from leezenflow.phase import TrafficLightPhase
 
 
 @fixture(scope="function")
@@ -24,8 +27,62 @@ def interpreter():
 
 
 @fixture(scope="function")
+def captured_raw_message_parsed() -> MessageContentRaw:
+    return MessageContentRaw(
+        signal_group=12,
+        lsa_id=1090,
+        time_stamp=8430,
+        moy=203635,
+        movement_events=[
+            MovementEventRaw(
+                min_time=33450,
+                max_time=33590,
+                likely_time=33530,
+                current_phase="3",
+                confidence=15,
+            ),
+            MovementEventRaw(
+                min_time=33540,
+                max_time=33540,
+                likely_time=33540,
+                current_phase="4",
+                confidence=3,
+            ),
+            MovementEventRaw(
+                min_time=33710,
+                max_time=33810,
+                likely_time=33730,
+                current_phase="5",
+                confidence=3,
+            ),
+            MovementEventRaw(
+                min_time=33740,
+                max_time=33750,
+                likely_time=33750,
+                current_phase="7",
+                confidence=3,
+            ),
+            MovementEventRaw(
+                min_time=33760,
+                max_time=34630,
+                likely_time=34430,
+                current_phase="3",
+                confidence=3,
+            ),
+        ],
+    )
+
+
+@fixture(scope="function")
 def sample_log() -> str:
     LOG_FILE = Path("tests/test_data/spat.xml")
+    sample_log = LOG_FILE.read_text()
+    return sample_log
+
+
+@fixture(scope="function")
+def captured_spat_log() -> str:
+    LOG_FILE = Path("tests/test_data/captured-spat-lf-ms-j.xml")
     sample_log = LOG_FILE.read_text()
     return sample_log
 
@@ -120,6 +177,76 @@ def test__parse_xml(
                 likely_time=33540,
                 current_phase="7",
                 confidence=15,
+            ),
+        ],
+    )
+
+
+def test__parse_captured_xml(
+    captured_spat_log: str,
+    captured_raw_message_parsed: MessageContentRaw,
+    interpreter: Interpreter,
+    monkeypatch,
+):
+    message = captured_spat_log
+
+    # mock command line arguments "signal_group" to value 1 (present in sample log) # noqa: E501
+    monkeypatch.setattr(
+        "leezenflow.command_line_args.CommandLineArgs.get_arguments",
+        lambda: Arguments(),
+    )
+    # run interpreter with sample log message and mocked command line arguments
+    return_value = _parse_xml(message=message, signal_group=12, lsa_id=1090)
+
+    # check if message is interpreted correctly
+    assert return_value == captured_raw_message_parsed
+
+
+def test_convert_raw_message_to_parsed_with_captured_spat(
+    captured_raw_message_parsed: MessageContentRaw,
+    interpreter: Interpreter,
+):
+    return_value = convert_raw_message_to_parsed(message=captured_raw_message_parsed)
+    assert return_value == MessageContentParsed(
+        signal_group=12,
+        time_stamp=8430,
+        moy=203635,
+        lsa_id=1090,
+        movement_events=[
+            MovementEventParsed(
+                min_time=timedelta(seconds=36, microseconds=570000),
+                max_time=timedelta(seconds=50, microseconds=570000),
+                likely_time=timedelta(seconds=44, microseconds=570000),
+                current_phase=TrafficLightPhase.RED,
+                confidence=100,
+            ),
+            MovementEventParsed(
+                min_time=timedelta(seconds=45, microseconds=570000),
+                max_time=timedelta(seconds=45, microseconds=570000),
+                likely_time=timedelta(seconds=45, microseconds=570000),
+                current_phase=TrafficLightPhase.RED_YELLOW,
+                confidence=56,
+            ),
+            MovementEventParsed(
+                min_time=timedelta(seconds=62, microseconds=570000),
+                max_time=timedelta(seconds=72, microseconds=570000),
+                likely_time=timedelta(seconds=64, microseconds=570000),
+                current_phase=TrafficLightPhase.GREEN,
+                confidence=56,
+            ),
+            MovementEventParsed(
+                min_time=timedelta(seconds=65, microseconds=570000),
+                max_time=timedelta(seconds=66, microseconds=570000),
+                likely_time=timedelta(seconds=66, microseconds=570000),
+                current_phase=TrafficLightPhase.YELLOW,
+                confidence=56,
+            ),
+            MovementEventParsed(
+                min_time=timedelta(seconds=67, microseconds=570000),
+                max_time=timedelta(seconds=154, microseconds=570000),
+                likely_time=timedelta(seconds=134, microseconds=570000),
+                current_phase=TrafficLightPhase.RED,
+                confidence=56,
             ),
         ],
     )
