@@ -10,12 +10,12 @@ from leezenflow.message_interpreter import (
 from leezenflow.phase import TrafficLightPhase
 
 
-def _draw_traffic_light(phase, remaining_seconds, moy, timestamp):
+def _draw_traffic_light(phase, remaining_seconds, moy, timestamp, movement_events):
     line_up = "\033[1A"
     line_clear = "\x1b[2K"
 
     # clear previous output
-    for x in range(6):
+    for x in range(7):
         print(line_up, end=line_clear)
     if phase == TrafficLightPhase.RED_YELLOW:  # red + yellow (when a red phase ends)
         print("\033[1;31m\u2B24\033[0;0m")
@@ -36,9 +36,18 @@ def _draw_traffic_light(phase, remaining_seconds, moy, timestamp):
     else:
         raise ValueError(f"simulation_display: Got Unknown Phase - {phase}")
 
+    debug_movement_events_list = list(
+        map(
+            lambda e: (e.current_phase.name, e.likely_time.total_seconds()),
+            movement_events,
+        )
+    )
     print("------")
     print(f"remaining phase seconds: { remaining_seconds}s")
-    print(f"SPAT timestamp: {_calculate_timestamp(moy, timestamp)}")
+    print(
+        f"SPAT timestamp: moy:{moy} ts:{timestamp} ({_calculate_timestamp(moy, timestamp)})"
+    )
+    print(f"Movements Events: {debug_movement_events_list}")
 
 
 def _calculate_timestamp(moy, timestamp):
@@ -60,4 +69,5 @@ def display_spat(unparsed_message: MessageContentRaw):
         message.movement_events[0].likely_time.total_seconds(),
         message.moy,
         message.time_stamp,
+        message.movement_events,
     )

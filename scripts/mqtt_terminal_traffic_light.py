@@ -44,5 +44,7 @@ if __name__ == "__main__":
             phase = data.movement_events[0].current_phase
             remaining = data.movement_events[0].likely_time.total_seconds()
             moy = data.moy
-            _draw_traffic_light(phase, remaining, moy, data.time_stamp)
+            _draw_traffic_light(
+                phase, remaining, moy, data.time_stamp, data.movement_events
+            )
         time.sleep(0.1)
